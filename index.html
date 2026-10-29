@@ -166,6 +166,18 @@ h1,h2,h3,p{margin:0}
 .chip{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px 0 8px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:12px;box-shadow:var(--shadow)}
 .chip svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* [追加] 運用バッジ・レイヤーパネル・スケジュール */
+.utag{display:inline-block;padding:2px 9px;border-radius:99px;background:var(--tc);color:#fff;font-size:11px;font-weight:800;margin:0 4px 4px 0;line-height:1.5}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
+.chips.wrap .chip{box-shadow:none}
+.lyr{display:grid;gap:4px}
+.lyr .switch{min-height:38px}
+.lyr .switch svg{width:20px;height:20px;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.lyrh{font-size:12px;font-weight:800;color:var(--ink-2);margin:14px 0 6px}
+.sched{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.sched li{display:flex;align-items:center;gap:10px;min-height:40px;border-bottom:1px solid var(--line);cursor:pointer}
+.sched li:last-child{border-bottom:0}
+.sched .mono{min-width:92px;font-weight:700}
 .legend{position:absolute;left:max(12px,env(safe-area-inset-left,0px));bottom:26px;z-index:2;display:grid;gap:3px;font-size:10.5px;font-weight:700;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 9px;opacity:.96;pointer-events:none}
 .mapwrap.ai .legend{display:none}
 .legend span{display:flex;align-items:center;gap:6px;white-space:nowrap}
@@ -278,11 +290,9 @@ h1,h2,h3,p{margin:0}
     <header class="top gut">
       <div class="brand">
         <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="11" cy="11" r="7.5" fill="none" stroke="#e8352e" stroke-width="3"/><circle cx="19" cy="11" r="7.5" fill="none" stroke="#2150e0" stroke-width="3"/><circle cx="15" cy="19" r="7.5" fill="none" stroke="#e8352e" stroke-width="3" opacity=".75"/></svg>
-        <div><b>EXPO 2025 Visitors</b><small>チケット・予約・決済・マップ</small></div>
+        <div><b>EXPO 2025 Visitors</b><small class="hours" id="hoursChip">9:00 - 22:00</small><!-- [修正] 営業時間をタイトル下に表示（重なり防止） --></div>
       </div>
       <div class="top-r">
-        <!-- [修正] 営業時間（9:00 - 22:00）をヘッダーに常時表示 -->
-        <span class="hours" id="hoursChip">9:00 - 22:00</span>
         <span class="net" id="net"><i></i><span id="netTxt">オンライン</span></span>
         <button class="qrbtn" id="qrOpen" aria-label="入場QRコードを表示">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v2M14 20h3M20 18v3"/></svg>入場QR
@@ -307,6 +317,9 @@ h1,h2,h3,p{margin:0}
 
           <!-- [修正] 本日の営業時間（会場・パビリオン・イベント共通） -->
           <div class="sec" id="hoursBox"></div>
+
+          <!-- [追加] このあとの予定（当日予約開放・ショー） -->
+          <div class="sec" id="schedBox"></div>
 
           <div class="sec" id="nextBox"></div>
 
@@ -355,7 +368,7 @@ h1,h2,h3,p{margin:0}
           </svg>
           <div class="mtop gut">
             <form class="search" id="msearch" autocomplete="off">
-              <input id="q" type="search" placeholder="柱番号・施設名で検索（例：柱番号 45）" aria-label="柱番号または施設名を検索" enterkeyhint="search">
+              <input id="q" type="search" placeholder="柱番号・施設・国名・設備（例：45／給水機／先着のみ）" aria-label="柱番号、施設名、国名、設備、運用区分で検索" enterkeyhint="search">
               <button type="submit">検索</button>
             </form>
             <div class="seg" id="modeSeg" role="group" aria-label="表示モード">
@@ -375,7 +388,7 @@ h1,h2,h3,p{margin:0}
           </div>
           <div class="mapmsg" id="mapmsg" hidden></div>
           <div class="aipanel gut" id="aipanel" hidden></div>
-          <div class="mapnote">公式マップ（2025年9月版 Ver.2）を基にした概略図／混雑・予約状況はサンプル</div>
+          <div class="mapnote">公式マップ（Ver.2）＋有志マップ（Ver.2.24）の情報を基にした概略図／混雑・予約状況はサンプル</div>
         </div>
       </section>
 
@@ -459,6 +472,8 @@ h1,h2,h3,p{margin:0}
   </aside>
 </div>
 
+<!-- [追加] 有志マップから抽出したデータ（expo2025_mapdata.json と同内容） -->
+<script type="application/json" id="mapdata">{"meta":{"source":"2025年大阪・関西万博 非公式マップ Ver.2.24（FINAL 10/9更新・主目的：パビリオン巡り）","extracted":"2026-10-29","coords":"座標はアプリの地図座標（公式マップ面のpx）。有志マップ上の位置を、大屋根リング柱番号と主要施設の対応点から変換した概略値（誤差 数十m程度）。","caution":"開放時間・運用区分は会期中の参考情報（日によって違いあり）。"},"opening_hours":{"open":"09:00","close":"22:00"},"tag_defs":{"res":{"label":"予約のみ","color":"#1f7a3a"},"first":{"label":"先着のみ","color":"#d0186b"},"both":{"label":"先着・予約","color":"#7a3fc4"},"partial":{"label":"一部自由入場","color":"#e0442c"},"principle":{"label":"原則予約","color":"#2a7f62"},"cancel":{"label":"キャンセル枠あり","color":"#b8860b"},"sameday":{"label":"当日整理券・当日予約","color":"#1565c0"}},"facility_tags":[{"name":"テーマウィークスタジオ","tags":["res"]},{"name":"GUNDAM NEXT FUTURE PAVILION","tags":["res"]},{"name":"オーストラリア館","tags":["res"]},{"name":"関西パビリオン","tags":["res"]},{"name":"EARTH MART","tags":["res"]},{"name":"パナソニックグループパビリオン「ノモの国」","tags":["res"]},{"name":"ガスパビリオン おばけワンダーランド","tags":["res","partial"]},{"name":"BLUE OCEAN DOME（ブルーオーシャン・ドーム）","tags":["res","partial"]},{"name":"いのちめぐる冒険","tags":["res","partial"]},{"name":"いのちの遊び場 クラゲ館","tags":["res","partial"]},{"name":"電力館 可能性のタマゴたち","tags":["res","partial"]},{"name":"NTTパビリオン","tags":["res","partial"]},{"name":"空飛ぶクルマ ステーション","tags":["res","partial"]},{"name":"Better Co-Being","tags":["res","cancel"],"note":"12時台に1回、ほかキャンセル枠の開放あり"},{"name":"いのちの未来","tags":["res","cancel"],"entry":"予約・キャンセル待ち"},{"name":"いのち動的平衡館","tags":["res","cancel"],"entry":"予約・キャンセル待ち"},{"name":"タイ館","tags":["both","partial"]},{"name":"大阪ヘルスケアパビリオン Nest for Reborn","tags":["both","partial"]},{"name":"Dialogue Theater －いのちのあかし－","tags":["both","partial"]},{"name":"大韓民国館","tags":["both"]},{"name":"イタリア館","tags":["both"]},{"name":"バチカン館","tags":["both"]},{"name":"ハンガリー館","tags":["both"]},{"name":"ポーランド館","tags":["both"]},{"name":"クウェート館","tags":["both"]},{"name":"国際機関館","tags":["both"]},{"name":"国際連合館","tags":["both"]},{"name":"国際赤十字・赤新月運動館","tags":["both"]},{"name":"null²","tags":["both"],"entry":"先着1回・予約","note":"先着（ウォークスルー）・抽選（おみくじ）入場を不定期開催"},{"name":"日本館","tags":["both"],"entry":"先着入場 9:20〜定員で終了／19:00〜"},{"name":"カナダ館","tags":["both"],"entry":"先着入場 9:00〜定員で終了"},{"name":"TECH WORLD","tags":["principle","first","partial"]},{"name":"ウーマンズ パビリオン in collaboration with Cartier","tags":["principle","first","partial"]},{"name":"飯田グループ×大阪公立大学 共同出展館","tags":["principle","first"]},{"name":"PASONA NATUREVERSE","tags":["principle","first"]},{"name":"三菱未来館","tags":["principle","first"]},{"name":"未来の都市","tags":["principle","first"]},{"name":"オランダ館","tags":["principle","first"],"entry":"先着入場 9:00〜定員で終了"},{"name":"住友館","tags":["sameday","res","partial"],"entry":"当日整理券抽選（LINEアプリ）"},{"name":"アイルランド館","tags":["first","sameday"],"entry":"先着（展示）／9:00〜10:00 当日予約"},{"name":"ヨルダン館","tags":["sameday"],"entry":"当日予約"},{"name":"ORA外食パビリオン『宴〜UTAGE〜』","tags":["first"]},{"name":"夜の地球 Earth at Night","tags":["first"]},{"name":"バルト館","tags":["first"]},{"name":"北欧館","tags":["first"]},{"name":"よしもと waraii myraii館","tags":["first"]},{"name":"ロボット&モビリティ ステーション","tags":["first"]},{"name":"ミャクミャクハウス","tags":["first"]},{"name":"フューチャーライフヴィレッジ","tags":["first"]},{"name":"ジュニアSDGsキャンプ","tags":["first"]},{"name":"バーレーン館","tags":["first"]},{"name":"コモンズ館A","tags":["first"]},{"name":"コモンズ館B","tags":["first"]},{"name":"コモンズ館C","tags":["first"]},{"name":"コモンズ館D","tags":["first"]},{"name":"コモンズ館E","tags":["first"],"note":"万博漫画展ほか"},{"name":"コモンズ館F","tags":["first"]},{"name":"トルコ館","tags":["first"]},{"name":"スペイン館","tags":["first"]},{"name":"モナコ館","tags":["first"]},{"name":"ウズベキスタン館","tags":["first"]},{"name":"インド館","tags":["first"]},{"name":"インドネシア館","tags":["first"]},{"name":"サウジアラビア館","tags":["first"]},{"name":"アゼルバイジャン館","tags":["first"]},{"name":"ドイツ館","tags":["first"]},{"name":"ルクセンブルク館","tags":["first"]},{"name":"ネパール館","tags":["first"]},{"name":"セルビア館","tags":["first"]},{"name":"バングラデシュ館","tags":["first"]},{"name":"セネガル館","tags":["first"]},{"name":"エジプト館","tags":["first"]},{"name":"マレーシア館","tags":["first"]},{"name":"ベルギー館","tags":["first"]},{"name":"欧州連合館","tags":["first"]},{"name":"アルジェリア館","tags":["first"]},{"name":"カンボジア館","tags":["first"]},{"name":"チュニジア館","tags":["first"]},{"name":"チリ館","tags":["first"]},{"name":"オマーン館","tags":["first"]},{"name":"シンガポール館","tags":["first"]},{"name":"ブルガリア館","tags":["first"]},{"name":"ルーマニア館","tags":["first"]},{"name":"英国館","tags":["first"]},{"name":"アンゴラ館","tags":["first"]},{"name":"ペルー館","tags":["first"]},{"name":"モザンビーク館","tags":["first"]},{"name":"フィリピン館","tags":["first"]},{"name":"アメリカ合衆国館","tags":["first"]},{"name":"フランス館","tags":["first"]},{"name":"ベトナム館","tags":["first"]},{"name":"中華人民共和国館","tags":["first"]},{"name":"ブラジル館","tags":["first"]},{"name":"カタール館","tags":["first"]},{"name":"アラブ首長国連邦館","tags":["first"]},{"name":"オーストリア館","tags":["first"]},{"name":"スイス館","tags":["first"]},{"name":"コロンビア館","tags":["first"]},{"name":"チェコ館","tags":["first"]},{"name":"マルタ館","tags":["first"]},{"name":"トルクメニスタン館","tags":["first"]},{"name":"ポルトガル館","tags":["first"]},{"name":"モビリティエクスペリエンス","tags":[],"note":"10/3・10/8 は予約にて機体特別公開（空飛ぶクルマ）"},{"name":"EXPOホール「シャインハット」","tags":[],"note":"プロジェクションマッピング 19:00〜19:20／20:10〜20:30"}],"new_facilities":[{"name":"バーレーン館","short":"バーレーン","g":"バ","zone":"P","pos":[918,783]}],"aliases":{"台湾":"TECH WORLD","バーラト":"インド館","EU":"欧州連合館","ガンダム":"GUNDAM NEXT FUTURE PAVILION","ノモの国":"パナソニックグループパビリオン「ノモの国」","モンハン":"大阪ヘルスケアパビリオン Nest for Reborn","ブルーオーシャン":"BLUE OCEAN DOME（ブルーオーシャン・ドーム）","クラゲ":"いのちの遊び場 クラゲ館","シャインハット":"EXPOホール「シャインハット」","ラトビア":"バルト館","リトアニア":"バルト館"},"pillars":{"count":116,"labeled_on_map":[1,10,20,30,40,50,60,70,78,"79〜90","91〜116"],"note":"01番は西南西、時計回り。79〜116番はリング南側（水辺側）"},"infra":{"elev":{"label":"エレベーター","sub":"大屋根リングへの昇降","pts":[[627,475],[823,378],[1034,475],[1086,663],[566,668],[1010,836]]},"baby":{"label":"ベビーケアルーム","sub":"授乳・おむつ替え","pts":[[643,400],[1051,431],[889,530],[864,610],[1241,482],[1284,598],[1078,804],[534,695],[440,499],[495,459]]},"kitchen":{"label":"キッチンカー・持ち帰り","sub":"キッチンカー／持ち帰り店舗","pts":[[647,427],[835,503],[1108,585],[1191,646],[1197,676],[1094,748],[965,548],[879,609],[824,688],[613,686],[755,681],[295,247],[268,351]]},"fountain":{"label":"水飲み場","sub":"水飲み場","pts":[[633,520],[833,522],[1048,612],[1213,602],[748,563],[742,677],[589,699],[972,807],[1206,687],[1060,783],[490,439],[310,250],[262,389]]},"ringwater":{"label":"給水・給湯機（リング上）","pts":[[685,433],[810,392],[1036,496],[568,587],[583,660],[1006,809]]},"ringwc":{"label":"トイレ（リング上）","pts":[[698,434],[809,379],[898,380],[960,392],[1029,481],[567,653],[1014,796]]}},"convenience":[{"fac":"mk1","label":"ローソン（東ゲートマーケットプレイス）"},{"fac":"mk8","label":"セブン-イレブン 西ゲート店"},{"fac":"mk6","label":"セブン-イレブン ウォータープラザ店"},{"fac":"mk9","label":"ファミリーマート（ウォータープラザ東）"}],"reservation_center":[{"fac":"パビリオン/イベント当日登録・免税センター","label":"当日予約センター（パビリオン/イベント当日登録）"}],"commons":{"A":["イエメン","ウガンダ","エスワティニ","ガーナ","北マケドニア","ギニアビサウ","キルギス","グレナダ","ケニア","コソボ","コモロ","サモア","スリナム","スリランカ","セーシェル","セントクリストファー・ネイビス","セントルシア","ソロモン諸島","トリニダード・トバゴ","トンガ","バヌアツ","パプアニューギニア","パラオ","バルバドス","ブルンジ","ボリビア","マラウイ","モーリシャス","ルワンダ"],"B":["エチオピア","カーボベルデ","ガイアナ","ガンビア","コートジボワール","ザンビア","シエラレオネ","ジブチ","ジャマイカ","ジンバブエ","セントビンセント及びグレナディーン諸島","ソマリア","タンザニア","チャド","中央アフリカ","ツバル","ドミニカ共和国","ナウル","ハイチ","パラグアイ","東ティモール","フィジー","ベナン","ミクロネシア","モーリタニア","レソト"],"C":["イスラエル","ウクライナ","ウルグアイ","ガボン","グアテマラ","クロアチア","サンマリノ","スロバキア","スロベニア","パナマ","モンテネグロ"],"D":["アンティグア・バーブーダ","カメルーン","ギニア","キューバ","コンゴ民主共和国","サントメ・プリンシペ","スーダン","赤道ギニア","タジキスタン","トーゴ","ナイジェリア","パキスタン","パレスチナ","ブータン","ブルキナファソ","ベリーズ","ホンジュラス","マーシャル諸島","マダガスカル","マリ","南スーダン","モルドバ","モンゴル","ラオス","リベリア"],"F":["アルメニア","カザフスタン","ブルネイ"]},"commons_notes":{"E":"万博漫画展ほか","B":"26か国","A":"29か国","C":"11か国","D":"25か国"},"schedule":{"releases":[{"name":"GUNDAM NEXT FUTURE PAVILION","times":["10:00","10:30","12:00","15:00","17:00","19:00"],"note":null},{"name":"null²","times":["12:00","14:00","17:00","18:30"],"note":null},{"name":"電力館 可能性のタマゴたち","times":["11:00","13:00","15:00","17:00"],"note":null},{"name":"関西パビリオン","times":["10:30","11:30","12:30","13:30","14:30","15:30","16:30","17:30","18:30"],"note":"10:30〜18:30 毎時30分"},{"name":"いのちの未来","times":["10:30","13:00","14:30","17:00"],"note":null},{"name":"いのちめぐる冒険","times":["12:00-13:00","16:00-17:00"],"note":null},{"name":"住友館","times":["12:00-13:00","18:30-19:00"],"note":null},{"name":"アイルランド館","times":["09:45-10:00","11:45-12:00","15:45-16:00","18:45-19:00"],"note":"ツアー 9:45〜10:00・11:45〜12:00／ライブ 15:45〜16:00／展示 18:45〜19:00"},{"name":"Better Co-Being","times":[],"note":"12時台に1回、ほかキャンセル枠の開放あり"},{"name":"BLUE OCEAN DOME（ブルーオーシャン・ドーム）","times":[],"note":"時間・回数ともにランダム"},{"name":"いのちの遊び場 クラゲ館","times":["14:30-15:30"],"note":null},{"name":"NTTパビリオン","times":["13:00-13:30"],"note":null},{"name":"大阪ヘルスケアパビリオン Nest for Reborn","times":["12:30","16:30"],"note":"モンハン（モンスターハンター）枠"},{"name":"日本館","times":["11:30","13:30"],"note":null},{"name":"空飛ぶクルマ ステーション","times":[],"note":"12時台ほか1回"},{"name":"ヨルダン館","times":[],"note":"一日2回ランダム"},{"name":"EARTH MART","times":["12:45-13:30"],"note":null},{"name":"三菱未来館","times":["13:00"],"note":null},{"name":"パナソニックグループパビリオン「ノモの国」","times":["14:00"],"note":"子ども枠のみ"},{"name":"ガスパビリオン おばけワンダーランド","times":["13:30-14:30"],"note":null},{"name":"ポーランド館","times":["09:20-10:00"],"note":null},{"name":"いのち動的平衡館","times":["16:30"],"note":null},{"name":"カナダ館","times":["17:00"],"note":"17:00前後ほか1〜3回"}],"shows":[{"name":"水と空気のシンフォニー","place":"ウォータープラザ","pos":[709,784],"times":["10:00-10:05","11:00-11:05","12:00-12:05","13:00-13:05","14:00-14:05","15:00-15:05","16:00-16:05"],"note":"10:00〜16:00 毎時0分〜5分"},{"name":"水と空気のマジカルダンス","place":"ウォータープラザ","pos":[709,784],"times":[],"note":"シンフォニーの後にランダム開催（20分）"},{"name":"EXPO Thanks 花火大会","place":"ウォータープラザ","pos":[709,784],"times":["18:35"],"note":null},{"name":"アオと夜の虹のパレード","place":"ウォータープラザ","pos":[709,784],"times":["19:10","20:30"],"note":"観覧席は予約のみ"},{"name":"ドローンショー","place":"ウォータープラザ","pos":[709,784],"times":["19:37-19:45"],"note":null},{"name":"プロジェクションマッピング","place":"EXPOホール「シャインハット」","fac":"EXPOホール「シャインハット」","times":["19:00-19:20","20:10-20:30"],"note":null},{"name":"空飛ぶクルマ 海上デモフライト","place":"北西部（EXPOアリーナ側の海上）","pos":[250,365],"times":["11:00","14:00"],"note":"10/1・2・5〜7・9・10・12・13 は 11:00〜／14:00〜、10/4・10/11 は 16:00〜（検討中）も。各10分程度"}],"caution":"上記はズレや日によっての違いがあるため参考程度"}}</script>
 <script>
 (function(){
 'use strict';
@@ -722,8 +737,63 @@ function closeTs(ts){return dayAt(OPENING_HOURS.close,ts)}
 function isOpenAt(ts){return ts>=openTs(ts)&&ts<closeTs(ts)}
 function isOpenNow(){return isOpenAt(Date.now())}
 function slotInHours(t){return t>=openTs(t)&&t+SLOT_MS<=closeTs(t)} // 枠の開始〜終了が営業時間内に収まるか
+/* ================================================================
+   [追加] 有志マップ（非公式マップ Ver.2.24・10/9更新）のリアルデータ統合
+   データ本体は <script id="mapdata" type="application/json">（= expo2025_mapdata.json と同内容）
+   ================================================================ */
+var MD={};try{MD=JSON.parse(document.getElementById('mapdata').textContent)}catch(e){MD={}}
+var TAGDEF=MD.tag_defs||{};
+function facByName(n){return F.find(function(f){return f.name===n})||F.find(function(f){return f.name.indexOf(n)===0})}
+/* ① 運用ステータス・入場条件タグ */
+(MD.new_facilities||[]).forEach(function(o){if(facByName(o.name))return;PV(o.name.replace(/館$/,''),o.pos[0],o.pos[1],o.zone,'p',{c:1,short:o.short,g:o.g})});
+(MD.facility_tags||[]).forEach(function(t){var f=facByName(t.name);if(!f)return;f.tags=t.tags||[];if(t.entry)f.entry=t.entry;if(t.note)f.unote=t.note});
+/* ④ コモンズ館の国名（有志マップの一覧で上書き・正式表記に統一） */
+Object.keys(MD.commons||{}).forEach(function(k){var f=FM['cm'+k];if(f)f.countries=MD.commons[k]});
+/* ⑤ スケジュール（当日予約開放時間・ショー）。営業時間 9:00〜22:00 の範囲外は除外 */
+function hm2ts(s,base){var a=s.split(':');var d=new Date(base==null?Date.now():base);d.setHours(+a[0],+a[1],0,0);return d.getTime()}
+function inHoursHM(s){var a=s.split(':'),m=a[0]*60+(+a[1]);return m>=OPENING_HOURS.open*60&&m<=OPENING_HOURS.close*60}
+function slotOK(s){return s.split('-').every(inHoursHM)}
+var SCHED=[];
+((MD.schedule||{}).releases||[]).forEach(function(r){var f=facByName(r.name);if(!f)return;r.times=(r.times||[]).filter(slotOK);f.release=r;r.times.forEach(function(t){SCHED.push({kind:'release',f:f,t:t,label:(f.short||f.name)+' 当日予約開放'})})});
+var SHOWS=((MD.schedule||{}).shows||[]).map(function(s){s.times=(s.times||[]).filter(slotOK);if(s.fac){var f=facByName(s.fac);if(f){s.pos=f.pos;s.f=f}}s.times.forEach(function(t){SCHED.push({kind:'show',s:s,t:t,label:s.name})});return s});
+function schedTs(item){return hm2ts(item.t.split('-')[0])}
+function upcoming(n){var now=Date.now();return SCHED.filter(function(i){var e=hm2ts(item_end(i));return e>=now}).sort(function(a,b){return schedTs(a)-schedTs(b)}).slice(0,n)}
+function item_end(i){var p=i.t.split('-');return p[1]||p[0]}
+function fmtSlot(t){return t.replace('-','〜').replace(/^0/,'')}
+/* ③ 現地インフラ：有志マップのピクトを追加（座標は柱番号・主要施設から変換した概略値） */
+function addInfra(k,label,color,sub,pts){var g=INFRA.find(function(z){return z.k===k});if(g){g.pts=g.pts.concat(pts)}else INFRA.push({k:k,label:label,color:color,pts:pts,sub:sub})}
+var MI=MD.infra||{};
+INFRA.forEach(function(g){if(g.k==='aid')g.label='救護所・休憩所'});
+if(MI.ringwater)addInfra('water','給水機・給湯機','#1e88e5','',MI.ringwater.pts.map(function(p){return [p[0],p[1],'給水・給湯機（リング上）']}));
+if(MI.fountain)addInfra('fountain','水飲み場','#0aa1b5','水飲み場',MI.fountain.pts);
+addInfra('wc','トイレ','#2d6fe0','トイレ',F.filter(function(f){return f.kind==='wc'}).map(function(f){return [f.pos[0],f.pos[1],'トイレ']}).concat((MI.ringwc?MI.ringwc.pts:[]).map(function(p){return [p[0],p[1],'トイレ（リング上）']})));
+addInfra('center','当日予約センター','#e53935','当日予約センター',(MD.reservation_center||[]).map(function(c){var f=facByName(c.fac);return f?[f.pos[0],f.pos[1],c.label]:null}).filter(Boolean));
+if(MI.elev)addInfra('elev','エレベーター','#37474f','大屋根リングへの昇降',MI.elev.pts);
+addInfra('conv','コンビニ','#ef6c00','コンビニ',(MD.convenience||[]).map(function(c){var f=FM[c.fac];return f?[f.pos[0],f.pos[1],c.label]:null}).filter(Boolean));
+if(MI.baby)addInfra('baby','ベビーケアルーム','#d81b60','授乳・おむつ替え',MI.baby.pts);
+if(MI.kitchen)addInfra('kitchen','キッチンカー・持ち帰り','#6d4c41','キッチンカー／持ち帰り店舗',MI.kitchen.pts);
+/* チップの並び順（よく使うもの順） */
+var INFRA_ORDER=['wc','water','fountain','term','center','elev','aid','conv','baby','kitchen','batt'];
+INFRA.sort(function(a,b){return INFRA_ORDER.indexOf(a.k)-INFRA_ORDER.indexOf(b.k)});
+INFRA_ICON.fountain='<path d="M5 20h14M8 20v-6h8v6M12 14V9M12 9c0-3 2-5 5-5"/><path d="M17 4c1 1.2 1.5 2.3 1.5 3.3"/>';
+INFRA_ICON.wc='<circle cx="8" cy="5" r="2"/><circle cx="16" cy="5" r="2"/><path d="M8 8v12M6 9h4l0 6M16 8l-3 8h6l-3-8M16 16v4"/>';
+INFRA_ICON.center='<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M9 10h6"/>';
+INFRA_ICON.elev='<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M7 10l1.5-2 1.5 2M14 14l1.5 2 1.5-2"/>';
+INFRA_ICON.conv='<path d="M3 9l1.5-5h15L21 9M4 9h16v11H4zM9 20v-6h6v6"/>';
+INFRA_ICON.baby='<circle cx="12" cy="6" r="3"/><path d="M6 21c0-5 2.5-9 6-9s6 4 6 9M9 16h6"/>';
+INFRA_ICON.kitchen='<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 3c-2 1-3 4-3 7h3v11"/>';
+/* 検索キーワード → インフラ区分 */
+var INFRA_KW=[['fountain',['水飲み']],['center',['予約センター','当日登録']],['term',['予約端末','端末']],['water',['給水','給湯','マイボトル']],['wc',['トイレ','お手洗い','wc','化粧室']],['elev',['エレベーター','エレベータ','ev']],['aid',['救護','医療','休憩所','救急']],['conv',['コンビニ','ローソン','ファミマ','ファミリーマート','セブンイレブン','セブン-イレブン']],['baby',['ベビー','授乳','おむつ','赤ちゃん']],['kitchen',['キッチンカー','持ち帰り','テイクアウト']],['batt',['バッテリー','充電']]];
+var TAG_KW=[['res',['予約のみ']],['first',['先着のみ']],['both',['先着予約','先着・予約']],['partial',['一部自由','自由入場']],['principle',['原則予約']],['cancel',['キャンセル']],['sameday',['当日整理券','当日予約','整理券']]];
+function tagChip(k,fs){var d=TAGDEF[k];if(!d)return '';return '<span class="utag" style="--tc:'+d.color+'">'+esc(d.label)+'</span>'}
+function primaryTag(f){if(!f.tags||!f.tags.length)return null;if(state.tagFilter&&f.tags.indexOf(state.tagFilter)>=0)return state.tagFilter;return f.tags[0]}
+function svgTag(f,x,y,anchor){var k=primaryTag(f);if(!k)return '';var d=TAGDEF[k],txt=d.label+(f.tags.length>1?' +':''),w=txt.length*9+10,x0=anchor==='middle'?-w/2:0;return '<g transform="translate('+x+' '+y+')"><rect x="'+x0+'" y="-8" width="'+w+'" height="16" rx="8" style="fill:'+d.color+';stroke:var(--surface)" stroke-width="1.5"/><text class="bt" x="'+(x0+w/2)+'" y="3.6" font-size="9.5" text-anchor="middle" style="fill:#fff">'+esc(txt)+'</text></g>'}
+function hasTag(f){return !!(state.tagFilter&&f.tags&&f.tags.indexOf(state.tagFilter)>=0)}
+function dimOf(f){return state.tagFilter&&(f.kind==='pav'||f.kind==='com')&&!hasTag(f)}
+
 var state={
-  tab:'home',mode:'easy',infra:{water:false,term:true,batt:false,aid:false},
+  tab:'home',mode:'easy',infra:{wc:false,water:false,fountain:false,term:true,center:false,elev:false,aid:false,conv:false,baby:false,kitchen:false,batt:false},
+  layer:{tags:true,pillars:true},tagFilter:null, /* [追加] レイヤー表示と運用区分フィルター */
   fac:{},anns:[],log:[],last:null,me:{x:950,y:470},route:null,found:null,moveMe:false,
   res:[],lottery:[],balance:12800,points:150,stamps:{jp:1},hist:[],demo:true,rs:'pre',onlyOpen:true,wtab:'pay'
 };
@@ -867,6 +937,7 @@ function renderHours(){ /* [修正] 営業時間の表示と開場中／営業�
 }
 function renderHome(){
   renderHours(); // [修正]
+  renderSched(); // [追加]
   var nr=nextRes(),box=$('#nextBox');
   if(nr){
     var f=FM[nr.fid],mins=Math.max(0,Math.ceil((nr.t-Date.now())/60000)),wm=walkMin(state.me,fpos(f));
@@ -882,6 +953,11 @@ function renderHome(){
     return '<div class="ann'+(a.urgent?' urgent':'')+'"><div class="mk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3l12 5V6zM15 8a5 5 0 0 1 0 8M6 14l1 6h3l-1-5"/></svg></div><div><b>'+esc(a.text)+'</b><div class="small muted">'+esc(a.place||'')+'周辺 '+a.r+'m・'+hm(a.t)+'・現在地から'+d+'m'+(inside?'（範囲内）':'')+'</div></div></div>';
   }).join(''):'<div class="muted small">現在のお知らせはありません。</div>';
 }
+function renderSched(){ /* [追加] 有志マップのスケジュール（9:00〜22:00の範囲のみ） */
+  var b=$('#schedBox');if(!b)return;var open=isOpenNow(),list=open?upcoming(5):[];
+  b.innerHTML='<div class="h">このあとの予定（当日予約の開放・ショー）</div><div class="card">'+(list.length?'<ul class="sched">'+list.map(function(i,ix){return '<li data-si="'+SCHED.indexOf(i)+'"><span class="mono">'+fmtSlot(i.t)+'</span><span class="grow" style="font-weight:700">'+esc(i.label)+'</span><span class="tag">'+(i.kind==='release'?'予約開放':'ショー')+'</span></li>'}).join('')+'</ul>':'<div class="muted small">'+(open?'本日このあとの予定はありません。':'営業時間外です。予定は 9:00〜22:00 の間に表示されます。')+'</div>')+'<div class="small muted" style="margin-top:6px">有志マップ Ver.2.24 の情報（参考値。日によって違いあり）</div></div>';
+}
+$('#schedBox').addEventListener('click',function(e){var li=e.target.closest('[data-si]');if(!li)return;var i=SCHED[+li.dataset.si];if(!i)return;var pos=i.f?i.f.pos:i.s.pos;if(!pos)return;go('map');setTimeout(function(){state.found={x:pos[0],y:pos[1],label:i.label};buildPins();flyTo(pos[0],pos[1],3,550);showMsg(i.label+' '+fmtSlot(i.t),true);if(i.f)setTimeout(function(){facSheet(i.f.id)},500)},250)});
 $('#s-home').addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)go(b.dataset.go,{wtab:b.dataset.wtab})});
 
 /* ---------- Reservation ---------- */
@@ -1100,8 +1176,9 @@ function buildPins(){
   if(mode==='ai')recs.forEach(function(id){var f=FM[id];ov+='<line x1="'+state.me.x+'" y1="'+state.me.y+'" x2="'+f.pos[0]+'" y2="'+f.pos[1]+'" class="dash" style="stroke:var(--accent);stroke-opacity:.55" stroke-width="2.5" vector-effect="non-scaling-stroke"/>'});
   overG.innerHTML=ov;
   /* pillar labels (01〜116) */
-  if(lvl>=1){
+  if(state.layer.pillars){ /* [追加] 柱番号レイヤー（オン／オフ切替。縮小時は10番ごと） */
     for(var n=1;n<=PILLARS;n++){
+      if(lvl===0&&!(n%10===0||n===1))continue;
       if(lvl===1&&!(n%5===0||n===1))continue;
       var p=pillarPos(n);
       h+='<text class="tm" data-wx="'+p[0].toFixed(1)+'" data-wy="'+p[1].toFixed(1)+'" font-size="'+(lvl>=2?10:11)+'" text-anchor="middle" dominant-baseline="central" font-weight="600">'+pad(n)+'</text>';
@@ -1125,10 +1202,10 @@ function buildPins(){
     if(k==='station'){if(lvl<1&&f.id!=='stn')return;h+=pinG(f.id,wx,wy,'<rect x="-10" y="-10" width="20" height="20" rx="5" style="fill:var(--ink-2)"/><text class="bt" y="4" font-size="11" text-anchor="middle" style="fill:var(--bg)">'+f.g+'</text>'+(lvl>=1?lab(f.name,14,4,10,500):''));return}
     if(mode==='easy'){
       if(k==='pav'||k==='com'){
-        if(!f.major)return;
+        if(!f.major&&!hasTag(f))return; // [追加] 運用区分で絞り込み中は該当施設をすべて表示
         var showName=lvl>=1||f.top;
-        h+=pinG(f.id,wx,wy,'<g transform="scale('+(lvl===0?.85:1)+')">'+isoBlock(f)+(showName?'<text class="t" y="34" font-size="13" font-weight="900" text-anchor="middle">'+esc(f.short)+'</text>':'')+badge(s.st,10,22,-22,12,fl)+'</g>');
-      }else if(k==='wc'){if(lvl<2)return;h+=pinG(f.id,wx,wy,'<circle r="14" style="fill:#2d6fe0;stroke:var(--surface)" stroke-width="2.5"/>'+pictoWC())}
+        h+=pinG(f.id,wx,wy,'<g transform="scale('+(lvl===0?.85:1)+')">'+isoBlock(f)+(showName?'<text class="t" y="34" font-size="13" font-weight="900" text-anchor="middle">'+esc(f.short)+'</text>':'')+badge(s.st,10,22,-22,12,fl)+(state.layer.tags&&(lvl>=1||hasTag(f))?svgTag(f,0,showName?50:30,'middle'):'')+'</g>',dimOf(f)?'opacity=".22"':''); // [追加] 運用バッジ
+      }else if(k==='wc'){if(lvl<2||state.infra.wc)return;h+=pinG(f.id,wx,wy,'<circle r="14" style="fill:#2d6fe0;stroke:var(--surface)" stroke-width="2.5"/>'+pictoWC())}
       else if(k==='mkt'){if(lvl<1)return;h+=pinG(f.id,wx,wy,'<circle r="15" style="fill:#e07b1a;stroke:var(--surface)" stroke-width="2.5"/>'+pictoRest()+(lvl>=2?'<text class="t" y="29" font-size="12" font-weight="700" text-anchor="middle">'+esc(f.short)+'</text>':''))}
       else if(k==='plaza'&&lvl>=2){h+=pinG(f.id,wx,wy,'<text class="t" font-size="12" font-weight="500" text-anchor="middle" style="fill:var(--ink-2)">'+esc(f.name)+'</text>')}
     }else if(mode==='gachi'){
@@ -1136,13 +1213,14 @@ function buildPins(){
         var c=k==='com'?'var(--com-l)':'var(--pin-l)',t2=f.rule+'・'+(s.wait==null?'待ち—':(s.wait===0?'待ちなし':'待ち'+s.wait+'分'));
         var inner='<rect x="-9" y="-9" width="18" height="18" rx="5" style="fill:'+c+';stroke:var(--surface)" stroke-width="1.5"/><text class="bt" y="4" font-size="11" text-anchor="middle">'+esc(f.g.length>1?f.g.charAt(0):f.g)+'</text>'+badge(s.st,6.5,9,-9,8,fl);
         if(lvl>=2||(lvl>=1&&f.major))inner+='<text class="t" x="14" y="-1" font-size="11" font-weight="900">'+esc(f.short)+'</text>';
+        if(state.layer.tags&&(lvl>=2||hasTag(f)))inner+=svgTag(f,14,-16,'start'); // [追加] 運用バッジ
         if(lvl>=3)inner+='<text class="tm" x="14" y="11" font-size="10" font-weight="500">'+esc(t2)+'</text>';
         if(lvl>=3&&f.countries)inner+='<text class="t" x="14" y="22" font-size="9.5" font-weight="500" style="fill:var(--ink-2)">'+esc(f.countries.slice(0,3).join('・')+(f.countries.length>3?'…（'+f.countries.length+'か国）':''))+'</text>';
-        h+=pinG(f.id,wx,wy,inner);
+        h+=pinG(f.id,wx,wy,inner,dimOf(f)?'opacity=".22"':'');
       }else if(k==='venue'){if(lvl<2)return;h+=pinG(f.id,wx,wy,'<rect x="-7" y="-7" width="14" height="14" rx="3" style="fill:var(--ink-2);fill-opacity:.85;stroke:var(--surface)" stroke-width="1.5"/>'+(lvl>=3?'<text class="t" x="12" y="3.5" font-size="10" font-weight="500" style="fill:var(--ink-2)">'+esc(f.short)+'</text>':''))}
       else if(k==='plaza'){if(lvl<2)return;h+=pinG(f.id,wx,wy,'<text class="t" font-size="10.5" font-weight="500" text-anchor="middle" style="fill:var(--ink-2)">'+esc(f.name)+'</text>')}
       else if(k==='mkt'){if(lvl<1)return;h+=pinG(f.id,wx,wy,'<circle r="7" style="fill:#e07b1a;stroke:var(--surface)" stroke-width="1.5"/>'+(lvl>=2?'<text class="t" x="11" y="3.5" font-size="10" font-weight="500" style="fill:var(--ink-2)">'+esc(f.short)+'</text>':''))}
-      else if(k==='wc'){if(lvl<2)return;h+=pinG(f.id,wx,wy,'<circle r="6" style="fill:#2d6fe0;stroke:var(--surface)" stroke-width="1.5"/>')}
+      else if(k==='wc'){if(lvl<2||state.infra.wc)return;h+=pinG(f.id,wx,wy,'<circle r="6" style="fill:#2d6fe0;stroke:var(--surface)" stroke-width="1.5"/>')}
     }else{ /* ai */
       var ri=recs.indexOf(f.id);
       if(ri>=0){
@@ -1205,11 +1283,12 @@ function renderAI(){
 $('#aipanel').addEventListener('click',function(e){var b=e.target.closest('[data-rec]');if(!b)return;var f=FM[b.dataset.rec];flyTo(f.pos[0],f.pos[1],2.6,500);facSheet(f.id)});
 
 /* ----- search ----- */
-function showMsg(txt,clear){
+function showMsg(txt,clear,extra){
   var m=$('#mapmsg');m.hidden=!txt;if(!txt)return;
-  m.innerHTML='<span class="grow">'+esc(txt)+'</span>'+(clear?'<button type="button" id="msgClr">解除</button>':'');
+  m.innerHTML='<span class="grow">'+esc(txt)+'</span>'+(extra||'')+(clear?'<button type="button" id="msgClr">解除</button>':'');
+  var me=$('#msgMe');if(me)me.onclick=function(){if(!state.found)return;state.me={x:state.found.x,y:state.found.y};buildPins();renderHome();if(state.mode==='ai')renderAI();toast('現在地を '+state.found.label+' に補正しました')}; // [追加] 柱番号で現在地を補正
   m.classList.toggle('up',state.mode==='ai');
-  var c=$('#msgClr');if(c)c.onclick=function(){state.found=null;m.hidden=true;buildPins()};
+  var c=$('#msgClr');if(c)c.onclick=function(){state.found=null;state.tagFilter=null;m.hidden=true;renderChips();buildPins()};
 }
 $('#msearch').addEventListener('submit',function(e){
   e.preventDefault();
@@ -1220,38 +1299,94 @@ $('#msearch').addEventListener('submit',function(e){
     if(n<1||n>PILLARS){showMsg('柱番号は 01〜116 です。',false);return}
     var p=pillarPos(n),m=meters(state.me,{x:p[0],y:p[1]});
     state.found={x:p[0],y:p[1],label:'柱 '+pad(n)};buildPins();flyTo(p[0],p[1],4,550);
-    showMsg('柱番号 '+pad(n)+' にピン留めしました（現在地から約'+m+'m・徒歩'+Math.max(1,Math.round(m/WALK))+'分）',true);return;
+    showMsg('柱番号 '+pad(n)+' にピン留めしました（現在地から約'+m+'m・徒歩'+Math.max(1,Math.round(m/WALK))+'分）',true,'<button type="button" id="msgMe">ここを現在地に</button>');return;
   }
   var key=q.replace(/\s/g,'').toLowerCase();
+  /* [追加] 検索の強化：設備名 → 最寄りの設備／運用区分 → 該当施設を強調／ショー名 → 会場 */
+  function kwHit(w){w=w.toLowerCase();return key===w||(key.indexOf(w)>=0&&(w.length>=3||/[^\x00-\x7f]/.test(w)))} // 英字2文字（ev・wc）は完全一致のみ
+  var ik=INFRA_KW.find(function(e){return e[1].some(kwHit)});
+  if(ik){var g=INFRA.find(function(z){return z.k===ik[0]});
+    if(g&&g.pts.length){state.infra[g.k]=true;renderChips();
+      var best=g.pts.slice().sort(function(a,b){return dist(state.me,{x:a[0],y:a[1]})-dist(state.me,{x:b[0],y:b[1]})})[0],bm=meters(state.me,{x:best[0],y:best[1]});
+      state.found={x:best[0],y:best[1],label:'最寄りの'+g.label};buildPins();flyTo(best[0],best[1],3,550);
+      showMsg('最寄りの'+g.label+(best[2]&&best[2]!==g.label?'（'+best[2]+'）':'')+'：約'+bm+'m・徒歩'+Math.max(1,Math.round(bm/WALK))+'分。全'+g.pts.length+'か所を表示中',true);return}}
+  var tk=TAG_KW.find(function(e){return e[1].some(kwHit)});
+  if(tk){var tl=F.filter(function(f){return f.tags&&f.tags.indexOf(tk[0])>=0});
+    if(tl.length){state.tagFilter=tk[0];state.layer.tags=true;renderChips();
+      var tb=tl.slice().sort(function(a,b){return dist(state.me,fpos(a))-dist(state.me,fpos(b))})[0],tm=meters(state.me,fpos(tb));
+      state.found=null;buildPins();flyTo(tb.pos[0],tb.pos[1],1.8,550);
+      showMsg('「'+TAGDEF[tk[0]].label+'」の施設 '+tl.length+'件を強調表示中（最寄り：'+(tb.short||tb.name)+' 約'+tm+'m）',true);return}}
+  var sh=key.length>=2&&SHOWS.find(function(s){return s.pos&&s.name.replace(/\s/g,'').toLowerCase().indexOf(key)>=0});
+  if(sh){state.found={x:sh.pos[0],y:sh.pos[1],label:sh.name};buildPins();flyTo(sh.pos[0],sh.pos[1],3,550);
+    showMsg(sh.name+'（'+sh.place+'）'+(sh.times.length?' '+sh.times.map(fmtSlot).join('・'):'')+(sh.note?'　'+sh.note:''),true);return}
+  var alias=Object.keys(MD.aliases||{}).find(function(a){return key.indexOf(a.toLowerCase())>=0}),aliasF=alias?facByName(MD.aliases[alias]):null;
   function nm(f){return f.name.replace(/\s/g,'').toLowerCase()}
-  var hit=F.find(function(f){return f.kind!=='wc'&&nm(f)===key})||F.find(function(f){return f.kind!=='wc'&&(nm(f).indexOf(key)>=0||(f.short&&f.short.replace(/\s/g,'').toLowerCase().indexOf(key)>=0))})||F.find(function(f){return f.countries&&f.countries.some(function(c){return c.indexOf(key)>=0})})||F.find(function(f){return f.tenants&&f.tenants.some(function(t){return t.name.replace(/\s/g,'').toLowerCase().indexOf(key)>=0})});
+  var hit=F.find(function(f){return f.kind!=='wc'&&nm(f)===key})||F.find(function(f){return f.kind!=='wc'&&(nm(f).indexOf(key)>=0||(f.short&&f.short.replace(/\s/g,'').toLowerCase().indexOf(key)>=0))})||F.find(function(f){return f.countries&&f.countries.some(function(c){return c.indexOf(key)>=0})})||F.find(function(f){return f.tenants&&f.tenants.some(function(t){return t.name.replace(/\s/g,'').toLowerCase().indexOf(key)>=0})})||aliasF; // [追加] 別名（台湾・EU・ガンダム など）
   if(hit){
     var via='';
     if(hit.countries&&hit.name.replace(/\s/g,'').toLowerCase().indexOf(key)<0){var cc=hit.countries.find(function(c){return c.indexOf(key)>=0});if(cc)via=cc+'は'+hit.name+'にあります。'}
     if(hit.tenants&&nm(hit).indexOf(key)<0){var tt=hit.tenants.find(function(t){return t.name.replace(/\s/g,'').toLowerCase().indexOf(key)>=0});if(tt)via=tt.name+'は'+hit.name+'にあります。'}
     state.found={x:hit.pos[0],y:hit.pos[1],label:hit.short||hit.name};buildPins();flyTo(hit.pos[0],hit.pos[1],3,550);
     showMsg(via||(hit.name+' を表示しました'),true);setTimeout(function(){facSheet(hit.id)},500)}
-  else showMsg('「'+q+'」は見つかりませんでした。柱番号（例：柱番号 45）、施設名、展示国名で検索できます。',false);
+  else showMsg('「'+q+'」は見つかりませんでした。柱番号（例：45）、施設名、国名、設備（例：給水機）、運用区分（例：先着のみ）で検索できます。',false);
 });
 
 /* ----- infra chips & legend ----- */
+/* [追加] レイヤー切替チップ：先頭の「レイヤー」で詳細パネル、以降はワンタップでオン／オフ */
+function infraIcon(g){return '<svg viewBox="0 0 24 24" style="color:'+g.color+';stroke:'+g.color+'">'+(INFRA_ICON[g.k]||'')+'</svg>'}
+function renderChips(){
+  $('#infra').innerHTML='<button class="chip" id="layerBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>レイヤー</button>'+
+    (state.tagFilter?'<button class="chip" data-tf="" aria-pressed="true" aria-label="絞り込みを解除">'+esc(TAGDEF[state.tagFilter].label)+' ✕</button>':'')+
+    '<button class="chip" data-l="tags" aria-pressed="'+state.layer.tags+'">運用バッジ</button><button class="chip" data-l="pillars" aria-pressed="'+state.layer.pillars+'">柱番号</button>'+
+    INFRA.map(function(g){return '<button class="chip" data-k="'+g.k+'" aria-pressed="'+!!state.infra[g.k]+'">'+infraIcon(g)+g.label+'</button>'}).join('');
+}
+function layerSheet(){
+  function cnt(k){return F.filter(function(f){return f.tags&&f.tags.indexOf(k)>=0}).length}
+  function body(){
+    return '<h3 style="font-size:18px;font-weight:900">マップのレイヤー</h3><div class="lyr">'+
+      '<label class="switch"><input type="checkbox" data-l="tags" '+(state.layer.tags?'checked':'')+'>運用バッジ（予約のみ・先着のみ など）</label>'+
+      '<label class="switch"><input type="checkbox" data-l="pillars" '+(state.layer.pillars?'checked':'')+'>大屋根リングの柱番号（01〜116）</label></div>'+
+      '<div class="lyrh">運用区分で絞り込み</div><div class="chips wrap">'+['all'].concat(Object.keys(TAGDEF)).map(function(k){var on=k==='all'?!state.tagFilter:state.tagFilter===k;return '<button class="chip" data-tf="'+k+'" aria-pressed="'+on+'">'+(k==='all'?'すべて':esc(TAGDEF[k].label)+'（'+cnt(k)+'）')+'</button>'}).join('')+'</div>'+
+      '<div class="lyrh">現地インフラ</div><div class="lyr">'+INFRA.map(function(g){return '<label class="switch"><input type="checkbox" data-k="'+g.k+'" '+(state.infra[g.k]?'checked':'')+'>'+infraIcon(g)+'<span class="grow">'+g.label+'</span><span class="small muted">'+g.pts.length+'か所</span></label>'}).join('')+'</div>'+
+      '<p class="note">運用区分・リング上の設備・水飲み場・エレベーター・ベビーケア・キッチンカーは有志マップ（非公式 Ver.2.24・10/9更新）より。位置は柱番号と主要施設から換算した概略です。</p>'+
+      '<div class="btnrow"><button class="btn pri" data-x="close">閉じる</button></div>';
+  }
+  openSheet(body(),function(root){
+    root.onchange=function(e){var i=e.target;if(i.dataset.l)state.layer[i.dataset.l]=i.checked;if(i.dataset.k)state.infra[i.dataset.k]=i.checked;renderChips();buildPins()};
+    root.onclick=function(e){var b=e.target.closest('[data-tf],[data-x]');if(!b)return;if(b.dataset.x){closeSheet();return}
+      state.tagFilter=b.dataset.tf==='all'?null:b.dataset.tf;if(state.tagFilter)state.layer.tags=true;root.querySelector('.sh').innerHTML=body();renderChips();buildPins()};
+  });
+}
 (function(){
-  $('#infra').innerHTML=INFRA.map(function(g){return '<button class="chip" data-k="'+g.k+'" aria-pressed="'+state.infra[g.k]+'"><svg viewBox="0 0 24 24" style="color:'+g.color+'">'+INFRA_ICON[g.k]+'</svg>'+g.label+'</button>'}).join('');
+  renderChips(); // [追加] レイヤー切替（運用バッジ／柱番号／インフラ）
   $('#legend').innerHTML=['free','ticket','closed','wait'].map(function(k){return '<span>'+dotHTML(k)+ST[k].label.replace('本日受付終了／予約のみ','受付終了・予約のみ')+'</span>'}).join('');
-  $('#infra').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;var k=b.dataset.k;state.infra[k]=!state.infra[k];b.setAttribute('aria-pressed',state.infra[k]);buildPins()});
+  $('#infra').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;
+    if(b.id==='layerBtn'){layerSheet();return}
+    if(b.dataset.l){state.layer[b.dataset.l]=!state.layer[b.dataset.l]}
+    else if(b.dataset.tf!=null){state.tagFilter=null}
+    else if(b.dataset.k){state.infra[b.dataset.k]=!state.infra[b.dataset.k]}
+    renderChips();buildPins()});
 })();
 
 /* ----- facility sheet ----- */
 var KIND={pav:'パビリオン',com:'コモンズ館',venue:'イベント会場・施設',plaza:'広場',mkt:'マーケットプレイス',wc:'トイレ',gate:'ゲート',station:'駅・ターミナル',emover:'e Mover 停留所'};
+function extraRows(f){ /* [追加] 有志マップ由来の運用区分・開放時間・ショー */
+  var h='';
+  if((f.tags&&f.tags.length)||f.entry||f.unote)h+='<dt>運用区分<div class="small muted" style="font-weight:500">有志マップ</div></dt><dd>'+(f.tags||[]).map(tagChip).join('')+(f.entry?'<div class="small" style="font-weight:700">'+esc(f.entry)+'</div>':'')+(f.unote?'<div class="small muted" style="font-weight:500">'+esc(f.unote)+'</div>':'')+'</dd>';
+  if(f.release)h+='<dt>当日予約の開放<div class="small muted" style="font-weight:500">参考</div></dt><dd><span class="mono">'+(f.release.times.length?f.release.times.map(fmtSlot).join('・'):'—')+'</span>'+(f.release.note?'<div class="small muted" style="font-weight:500">'+esc(f.release.note)+'</div>':'')+'</dd>';
+  var sh=SHOWS.filter(function(s){return s.f===f});
+  if(sh.length)h+='<dt>ショー</dt><dd>'+sh.map(function(s){return esc(s.name)+' <span class="mono">'+s.times.map(fmtSlot).join('・')+'</span>'}).join('<br>')+'</dd>';
+  return h;
+}
 function facSheet(id){
   var f=FM[id],s=state.fac[id],m=meters(state.me,fpos(f)),w=Math.max(1,Math.round(m/WALK));
   var hasSt=!!s,stamp=STAMPS.indexOf(id)>=0,zn=f.zone?ZN[f.zone]:'';
   var gl=f.g||(f.kind==='wc'?'WC':'−');
   var html='<div class="sh-h"><div class="glyph'+(f.kind==='com'?' c':'')+'">'+esc(gl.length>2?gl.charAt(0):gl)+'</div><div class="grow"><h3>'+esc(f.name)+'</h3><div class="small muted">'+KIND[f.kind]+(zn?'・'+zn:'')+'</div></div></div>';
   if(hasSt){
-    html+='<div>'+pillHTML(s.st)+'</div><dl class="kv"><dt>予約の要否</dt><dd>'+esc(f.rule)+'<div class="small muted" style="font-weight:500">'+esc(STYLE[f.style].legend)+'</div></dd><dt>待ち時間</dt><dd class="mono">'+(s.wait==null?'—':(s.wait===0?'待ちなし':s.wait+'分'))+'</dd><dt>見学の目安</dt><dd class="mono">'+f.stay+'分</dd><dt>営業時間</dt><dd class="mono">'+OPENING_HOURS.label+(isOpenNow()?'':'<div class="small" style="font-weight:700">現在は営業時間外</div>')+'</dd>'+(f.countries?'<dt>'+(f.kind==='com'?'展示国（'+f.countries.length+'か国）':'参加国・機関')+'</dt><dd>'+esc(f.countries.join('・'))+'</dd>':(f.kind==='com'?'<dt>展示国</dt><dd>公式マップに記載なし</dd>':''))+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
+    html+='<div>'+pillHTML(s.st)+'</div><dl class="kv"><dt>予約の要否</dt><dd>'+esc(f.rule)+'<div class="small muted" style="font-weight:500">'+esc(STYLE[f.style].legend)+'</div></dd><dt>待ち時間</dt><dd class="mono">'+(s.wait==null?'—':(s.wait===0?'待ちなし':s.wait+'分'))+'</dd><dt>見学の目安</dt><dd class="mono">'+f.stay+'分</dd><dt>営業時間</dt><dd class="mono">'+OPENING_HOURS.label+(isOpenNow()?'':'<div class="small" style="font-weight:700">現在は営業時間外</div>')+'</dd>'+(f.countries?'<dt>'+(f.kind==='com'?'展示国（'+f.countries.length+'か国）':'参加国・機関')+'</dt><dd>'+esc(f.countries.join('・'))+'</dd>':(f.kind==='com'?'<dt>展示国</dt><dd>公式マップに記載なし</dd>':''))+extraRows(f)+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
   }else{
-    html+='<dl class="kv"><dt>営業時間</dt><dd class="mono">'+OPENING_HOURS.label+'</dd>'+(f.note?'<dt>案内</dt><dd>'+esc(f.note)+'</dd>':'')+(f.grid?'<dt>マップ区画</dt><dd class="mono">'+esc(f.grid)+'</dd>':'')+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
+    html+='<dl class="kv"><dt>営業時間</dt><dd class="mono">'+OPENING_HOURS.label+'</dd>'+(f.note?'<dt>案内</dt><dd>'+esc(f.note)+'</dd>':'')+(f.grid?'<dt>マップ区画</dt><dd class="mono">'+esc(f.grid)+'</dd>':'')+extraRows(f)+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
     if(f.tenants){
       html+='<div class="small muted" style="font-weight:700">店舗一覧（'+f.tenants.length+'店）</div><ul class="tn">'+f.tenants.map(function(t){return '<li><span class="mono no">'+esc(t.no)+'</span><span class="grow"><b>'+esc(t.name)+'</b><span class="small muted"> '+esc(t.cat)+'</span></span>'+(t.mark?'<span class="mk">'+esc(t.mark)+'</span>':'')+'</li>'}).join('')+'</ul><div class="note">●フードダイバーシティ対応　★未来型営業施設　◆未来型チャレンジショップ</div>';
     }
