@@ -53,6 +53,10 @@ h1,h2,h3,p{margin:0}
 .brand b{font-weight:900;font-size:15px;letter-spacing:.01em;white-space:nowrap}
 .brand small{display:block;font-size:10px;color:var(--ink-2);line-height:1.2;white-space:nowrap}
 .top-r{display:flex;align-items:center;gap:8px}
+/* [修正] 営業時間チップ・営業時間外の案内 */
+.hours{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink-2);white-space:nowrap;font-family:var(--f-mono)}
+.hours.off{color:var(--st-closed,#c62828)}
+.offhours{border:1px dashed var(--line);border-radius:12px;padding:12px;font-size:13px;font-weight:700;color:var(--ink-2);text-align:center}
 .net{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--ink-2);white-space:nowrap}
 .net i{width:8px;height:8px;border-radius:50%;background:var(--st-free)}
 .net.off i{background:var(--st-closed)}
@@ -263,6 +267,7 @@ h1,h2,h3,p{margin:0}
   .t-staff{display:none!important}
 }
 @media (max-width:420px){.net span{display:none}.brand small{display:none}}
+@media (max-width:480px){.hours{display:none}} /* [修正] 狭い画面ではヘッダーの営業時間を隠し、ホームのカードで表示 */
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -276,6 +281,8 @@ h1,h2,h3,p{margin:0}
         <div><b>EXPO 2025 Visitors</b><small>チケット・予約・決済・マップ</small></div>
       </div>
       <div class="top-r">
+        <!-- [修正] 営業時間（9:00 - 22:00）をヘッダーに常時表示 -->
+        <span class="hours" id="hoursChip">9:00 - 22:00</span>
         <span class="net" id="net"><i></i><span id="netTxt">オンライン</span></span>
         <button class="qrbtn" id="qrOpen" aria-label="入場QRコードを表示">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v2M14 20h3M20 18v3"/></svg>入場QR
@@ -297,6 +304,9 @@ h1,h2,h3,p{margin:0}
             <div class="perf"></div>
             <div class="qrmini qr" id="qrMini"></div>
           </button>
+
+          <!-- [修正] 本日の営業時間（会場・パビリオン・イベント共通） -->
+          <div class="sec" id="hoursBox"></div>
 
           <div class="sec" id="nextBox"></div>
 
@@ -701,19 +711,35 @@ var VIEW0=[470,370,1180,930], VIEWALL=[60,20,1410,990];
 /* ---------- state ---------- */
 var now0=Date.now();
 function roundTo5(ts){return Math.ceil(ts/300000)*300000}
+/* [修正] 営業時間を 9:00 - 22:00 に一律固定（会場・全パビリオン・イベント共通）
+   opening_hours：基本営業時間の定義。施設ごとの個別時間は持たない。
+   予約枠・整理券・抽選・個別スケジュールはすべてこの範囲内に限定し、範囲外は「営業時間外」扱いとする。 */
+var OPENING_HOURS={open:9,close:22,label:'9:00 - 22:00'};
+var SLOT_MS=1800000; // 予約枠は30分単位。最終枠は 21:30〜22:00
+function dayAt(h,ts){var d=new Date(ts==null?Date.now():ts);d.setHours(h,0,0,0);return d.getTime()}
+function openTs(ts){return dayAt(OPENING_HOURS.open,ts)}
+function closeTs(ts){return dayAt(OPENING_HOURS.close,ts)}
+function isOpenAt(ts){return ts>=openTs(ts)&&ts<closeTs(ts)}
+function isOpenNow(){return isOpenAt(Date.now())}
+function slotInHours(t){return t>=openTs(t)&&t+SLOT_MS<=closeTs(t)} // 枠の開始〜終了が営業時間内に収まるか
 var state={
   tab:'home',mode:'easy',infra:{water:false,term:true,batt:false,aid:false},
   fac:{},anns:[],log:[],last:null,me:{x:950,y:470},route:null,found:null,moveMe:false,
   res:[],lottery:[],balance:12800,points:150,stamps:{jp:1},hist:[],demo:true,rs:'pre',onlyOpen:true,wtab:'pay'
 };
 F.forEach(function(f){if(f.st)state.fac[f.id]={st:f.st,wait:f.wait,changed:0}});
+/* [修正] サンプル予約の基準時刻：営業時間内なら現在時刻、9:00前なら当日9:00、22:00以降なら翌日9:00。
+   基準から計算した予約のうち、営業時間（9:00 - 22:00）に収まらないものは除外する。 */
+var resBase=now0<openTs(now0)?openTs(now0):(now0>=closeTs(now0)?openTs(now0+86400000):now0);
 state.res=[
-  {id:'r1',fid:'jp',t:roundTo5(now0+40*60000),kind:'pre',no:null},
-  {id:'r2',fid:'it',t:roundTo5(now0+3*3600000),kind:'pre',no:null},
-  {id:'r3',fid:'hc',t:roundTo5(now0+5*3600000),kind:'pre',no:null}
-];
-state.anns=[{id:'a0',x:FM.ge.pos[0],y:FM.ge.pos[1],r:100,text:'東ゲート付近で傘の貸出中',urgent:false,t:now0-6*60000,exp:now0+50*60000,by:'GSA-0412',place:'東ゲート'}];
-state.hist=[{t:now0-3600000*2,label:'チャージ（クレジットカード）',amt:10000},{t:now0-3600000*1.2,label:'カフェテラス',amt:-680},{t:now0-1800000,label:'フードコート',amt:-1180}];
+  {id:'r1',fid:'jp',t:roundTo5(resBase+40*60000),kind:'pre',no:null},
+  {id:'r2',fid:'it',t:roundTo5(resBase+3*3600000),kind:'pre',no:null},
+  {id:'r3',fid:'hc',t:roundTo5(resBase+5*3600000),kind:'pre',no:null}
+].filter(function(r){return slotInHours(r.t)});
+/* [修正] お知らせ・決済履歴のサンプルも営業時間内の時刻だけを使う（営業時間外の起動時はお知らせなし） */
+state.anns=isOpenNow()?[{id:'a0',x:FM.ge.pos[0],y:FM.ge.pos[1],r:100,text:'東ゲート付近で傘の貸出中',urgent:false,t:Math.max(openTs(now0),now0-6*60000),exp:Math.min(closeTs(now0),now0+50*60000),by:'GSA-0412',place:'東ゲート'}]:[];
+var histBase=Math.min(now0,closeTs(now0));
+state.hist=[{t:histBase-3600000*2,label:'チャージ（クレジットカード）',amt:10000},{t:histBase-3600000*1.2,label:'カフェテラス',amt:-680},{t:histBase-1800000,label:'フードコート',amt:-1180}].filter(function(h){return isOpenAt(h.t)&&h.t<=now0});
 
 /* ---------- UI primitives ---------- */
 var toastT=0;
@@ -834,7 +860,13 @@ function setStatus(id,st,wait){publish({type:'status',id:id,st:st,wait:wait,by:'
 function nextRes(){
   var n=Date.now();var l=state.res.filter(function(r){return r.t>n&&r.kind!=='wait'}).sort(function(a,b){return a.t-b.t});return l[0]||null;
 }
+function renderHours(){ /* [修正] 営業時間の表示と開場中／営業時間外の判定 */
+  var open=isOpenNow(),chip=$('#hoursChip');
+  chip.textContent=(open?'開場中 ':'営業時間外 ')+OPENING_HOURS.label;chip.classList.toggle('off',!open);
+  $('#hoursBox').innerHTML='<div class="h">本日の営業時間</div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b class="mono" style="font-size:20px">'+OPENING_HOURS.label+'</b><span class="tag">'+(open?'開場中':'営業時間外')+'</span></div><div class="small muted" style="margin-top:6px">会場・パビリオン・イベント共通。整理券・予約枠は '+OPENING_HOURS.label+' の範囲内のみです。</div></div>';
+}
 function renderHome(){
+  renderHours(); // [修正]
   var nr=nextRes(),box=$('#nextBox');
   if(nr){
     var f=FM[nr.fid],mins=Math.max(0,Math.ceil((nr.t-Date.now())/60000)),wm=walkMin(state.me,fpos(f));
@@ -853,11 +885,19 @@ function renderHome(){
 $('#s-home').addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)go(b.dataset.go,{wtab:b.dataset.wtab})});
 
 /* ---------- Reservation ---------- */
+/* [修正] available_slots：予約枠は 9:00 - 22:00 の範囲内のみ生成する。
+   ・開始は「次の30分区切り＋30分」と「当日9:00」の遅い方
+   ・枠の終了が22:00を超えるもの（21:30より後の開始）は作らない
+   ・営業時間外（9:00前／22:00以降）は枠を返さない＝発行不可 */
 function slotsFor(fid,baseTs){
-  var out=[],t=Math.ceil((baseTs||Date.now())/1800000)*1800000+1800000,i;
-  for(i=0;i<6;i++){var rem=((i*7+fid.length*3+(fid.charCodeAt(0)%5))%9);out.push({t:t+i*1800000,rem:i===1&&fid==='us'?0:rem})}
+  var base=baseTs||Date.now(),out=[],i;
+  if(!isOpenAt(base))return out;
+  var t=Math.max(Math.ceil(base/SLOT_MS)*SLOT_MS+SLOT_MS,openTs(base));
+  for(i=0;i<6;i++){var ts=t+i*SLOT_MS;if(!slotInHours(ts))break;var rem=((i*7+fid.length*3+(fid.charCodeAt(0)%5))%9);out.push({t:ts,rem:i===1&&fid==='us'?0:rem})}
   return out;
 }
+var OFF_MSG='営業時間外です（営業時間 '+OPENING_HOURS.label+'）'; // [修正]
+function noSlotMsg(){return isOpenNow()?'本日の予約枠の受付は終了しました（最終枠 21:30〜22:00）':OFF_MSG} // [修正]
 function overlap(t,ignoreId){return state.res.find(function(r){return r.id!==ignoreId&&r.kind!=='wait'&&Math.abs(r.t-t)<1800000})}
 function resCard(r){
   var f=FM[r.fid],s=state.fac[r.fid];
@@ -874,6 +914,8 @@ function renderRes(keepScroll){
   state.res.forEach(function(r){r.flash=false});
   var rows=F.filter(function(f){return f.kind==='pav'&&f.sameType}).filter(function(f){var s=state.fac[f.id].st;return !state.onlyOpen||s==='ticket'||s==='wait'});
   $('#onlyOpen').checked=state.onlyOpen;
+  /* [修正] 営業時間外、または22:00までに取れる枠がない時間帯は、当日枠の発行を停止 */
+  if(!isOpenNow()||!slotsFor('x').length){$('#sameList').innerHTML='<div class="offhours">'+noSlotMsg()+'<br>整理券・当日予約・抽選の受付はできません。</div>';return}
   $('#sameList').innerHTML=rows.length?rows.map(function(f){
     var s=state.fac[f.id],fl=Date.now()-s.changed<4000;
     var mine=state.res.some(function(r){return r.fid===f.id&&r.kind==='ticket'});
@@ -897,6 +939,7 @@ $('#resPre').addEventListener('click',function(e){
 });
 function changeRes(r){
   var f=FM[r.fid],slots=slotsFor(r.fid,Date.now()),sel=null;
+  if(!slots.length){toast(noSlotMsg());return} // [修正] 営業時間外は時間変更不可
   function body(){return '<div class="sh-h"><div class="glyph">'+esc(f.g)+'</div><div><h3>'+esc(f.name)+'</h3><div class="small muted">現在の予約 '+hm(r.t)+'</div></div></div><div class="slotgrid">'+slots.map(function(s,i){var ov=overlap(s.t,r.id);return '<button class="slotbtn" data-i="'+i+'" aria-pressed="'+(sel===i)+'" '+((s.rem===0||ov)?'disabled':'')+'>'+hm(s.t)+'<small>'+(ov?'他の予約と重複':s.rem===0?'満席':'残り'+s.rem+'枠')+'</small></button>'}).join('')+'</div><button class="btn pri" id="chgOk" '+(sel==null?'disabled':'')+'>この時間に変更する</button>'}
   openSheet(body(),function(root){
     root.onclick=function(ev){
@@ -907,8 +950,10 @@ function changeRes(r){
 }
 $('#sameList').addEventListener('click',function(e){
   var b=e.target.closest('[data-same]');if(!b)return;var f=FM[b.dataset.same];
+  if(!isOpenNow()){toast(OFF_MSG);renderRes();return} // [修正] 営業時間外は整理券・キャンセル待ち・抽選を受け付けない
   if(b.dataset.w){state.res.push({id:'w'+Date.now(),fid:f.id,t:Date.now(),kind:'wait'});toast(f.name+'のキャンセル待ちに登録しました');state.rs='pre';renderRes();return}
   var slots=slotsFor(f.id,Date.now()),sel=null,lot=f.sameType==='抽選';
+  if(!slots.length){toast(noSlotMsg());renderRes();return} // [修正]
   function body(){return '<div class="sh-h"><div class="glyph">'+esc(f.g)+'</div><div><h3>'+esc(f.name)+'</h3><div class="small muted">'+(lot?'抽選申し込み（当選時のみ確定）':'先着整理券（その場で確定）')+'</div></div></div><div class="slotgrid">'+slots.map(function(s,i){var ov=overlap(s.t);return '<button class="slotbtn" data-i="'+i+'" aria-pressed="'+(sel===i)+'" '+((s.rem===0||ov)?'disabled':'')+'>'+hm(s.t)+'<small>'+(ov?'予約と重複':s.rem===0?'満席':(lot?'倍率 '+(2+s.rem%3)+'倍':'残り'+s.rem+'枠'))+'</small></button>'}).join('')+'</div><button class="btn pri" id="getOk" '+(sel==null?'disabled':'')+'>'+(lot?'この時間で応募する':'整理券を取得する')+'</button>'}
   openSheet(body(),function(root){
     root.onclick=function(ev){
@@ -916,6 +961,7 @@ $('#sameList').addEventListener('click',function(e){
       if(sb&&!sb.disabled){sel=+sb.dataset.i;root.querySelector('.sh').innerHTML=body();return}
       if(ev.target.id==='getOk'&&sel!=null){
         var t=slots[sel].t;closeSheet();
+        if(!slotInHours(t)||!isOpenNow()){toast(OFF_MSG);renderRes();return} // [修正] 確定直前にも範囲を再確認
         if(lot){
           var L={fid:f.id,t:t,result:null};state.lottery.push(L);toast(f.name+'の抽選に応募しました');state.rs='pre';renderRes();
           setTimeout(function(){var win=Math.random()<0.5;L.result=win;if(win){state.res.push({id:'l'+Date.now(),fid:f.id,t:t,kind:'lot',no:null,flash:true});toast('当選しました：'+f.name+' '+hm(t))}else toast('今回は落選でした：'+f.name);renderRes();renderHome()},6000);
@@ -1136,6 +1182,7 @@ $('#modeSeg').addEventListener('click',function(e){var b=e.target.closest('butto
 /* ----- AI recommendation ----- */
 function recommend(){
   var nr=nextRes(),avail=nr?Math.max(0,Math.round((nr.t-Date.now())/60000)-5):45;
+  avail=isOpenNow()?Math.min(avail,Math.max(0,Math.round((closeTs()-Date.now())/60000))):0; // [修正] 22:00の閉場を超える提案をしない
   var home=nr?fpos(FM[nr.fid]):state.me,out=[];
   F.forEach(function(f){
     if(f.kind!=='pav'&&f.kind!=='com')return;var s=state.fac[f.id];if(s.st==='closed')return;if(nr&&f.id===nr.fid)return;
@@ -1153,7 +1200,7 @@ function renderAI(){
   state.recs=recommend();var p=$('#aipanel'),nr=state.nextRes;
   p.hidden=state.mode!=='ai';
   p.innerHTML='<div class="aihead"><b>'+(nr?'次の予約まで あと'+Math.max(0,Math.round((nr.t-Date.now())/60000))+'分':'おすすめ3選')+'</b><span class="small muted">'+(nr?esc(FM[nr.fid].name)+' '+hm(nr.t)+' まで':'')+'</span></div>'+
-   (state.recs.length?state.recs.map(function(r,i){var s=state.fac[r.f.id];return '<button class="aicard" data-rec="'+r.f.id+'"><span class="n">'+(i+1)+'</span><span><b>'+esc(r.f.name)+'</b><span class="m">徒歩'+r.w+'分 + 待ち'+r.wt+'分 + 見学'+r.stay+'分 = '+r.total+'分'+(r.ok?'':'（時間ギリギリ）')+'</span></span>'+dotHTML(s.st)+'</button>'}).join(''):'<div class="muted">いま行ける施設が見つかりません。</div>');
+   (state.recs.length?state.recs.map(function(r,i){var s=state.fac[r.f.id];return '<button class="aicard" data-rec="'+r.f.id+'"><span class="n">'+(i+1)+'</span><span><b>'+esc(r.f.name)+'</b><span class="m">徒歩'+r.w+'分 + 待ち'+r.wt+'分 + 見学'+r.stay+'分 = '+r.total+'分'+(r.ok?'':'（時間ギリギリ）')+'</span></span>'+dotHTML(s.st)+'</button>'}).join(''):'<div class="muted">いま行ける施設が見つかりません。</div>')+(isOpenNow()?'':'<div class="offhours" style="margin-top:8px">'+OFF_MSG+'</div>'); // [修正]
 }
 $('#aipanel').addEventListener('click',function(e){var b=e.target.closest('[data-rec]');if(!b)return;var f=FM[b.dataset.rec];flyTo(f.pos[0],f.pos[1],2.6,500);facSheet(f.id)});
 
@@ -1202,9 +1249,9 @@ function facSheet(id){
   var gl=f.g||(f.kind==='wc'?'WC':'−');
   var html='<div class="sh-h"><div class="glyph'+(f.kind==='com'?' c':'')+'">'+esc(gl.length>2?gl.charAt(0):gl)+'</div><div class="grow"><h3>'+esc(f.name)+'</h3><div class="small muted">'+KIND[f.kind]+(zn?'・'+zn:'')+'</div></div></div>';
   if(hasSt){
-    html+='<div>'+pillHTML(s.st)+'</div><dl class="kv"><dt>予約の要否</dt><dd>'+esc(f.rule)+'<div class="small muted" style="font-weight:500">'+esc(STYLE[f.style].legend)+'</div></dd><dt>待ち時間</dt><dd class="mono">'+(s.wait==null?'—':(s.wait===0?'待ちなし':s.wait+'分'))+'</dd><dt>見学の目安</dt><dd class="mono">'+f.stay+'分</dd>'+(f.countries?'<dt>'+(f.kind==='com'?'展示国（'+f.countries.length+'か国）':'参加国・機関')+'</dt><dd>'+esc(f.countries.join('・'))+'</dd>':(f.kind==='com'?'<dt>展示国</dt><dd>公式マップに記載なし</dd>':''))+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
+    html+='<div>'+pillHTML(s.st)+'</div><dl class="kv"><dt>予約の要否</dt><dd>'+esc(f.rule)+'<div class="small muted" style="font-weight:500">'+esc(STYLE[f.style].legend)+'</div></dd><dt>待ち時間</dt><dd class="mono">'+(s.wait==null?'—':(s.wait===0?'待ちなし':s.wait+'分'))+'</dd><dt>見学の目安</dt><dd class="mono">'+f.stay+'分</dd><dt>営業時間</dt><dd class="mono">'+OPENING_HOURS.label+(isOpenNow()?'':'<div class="small" style="font-weight:700">現在は営業時間外</div>')+'</dd>'+(f.countries?'<dt>'+(f.kind==='com'?'展示国（'+f.countries.length+'か国）':'参加国・機関')+'</dt><dd>'+esc(f.countries.join('・'))+'</dd>':(f.kind==='com'?'<dt>展示国</dt><dd>公式マップに記載なし</dd>':''))+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
   }else{
-    html+='<dl class="kv">'+(f.note?'<dt>案内</dt><dd>'+esc(f.note)+'</dd>':'')+(f.grid?'<dt>マップ区画</dt><dd class="mono">'+esc(f.grid)+'</dd>':'')+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
+    html+='<dl class="kv"><dt>営業時間</dt><dd class="mono">'+OPENING_HOURS.label+'</dd>'+(f.note?'<dt>案内</dt><dd>'+esc(f.note)+'</dd>':'')+(f.grid?'<dt>マップ区画</dt><dd class="mono">'+esc(f.grid)+'</dd>':'')+'<dt>現在地から</dt><dd class="mono">'+m+'m（徒歩'+w+'分）</dd></dl>';
     if(f.tenants){
       html+='<div class="small muted" style="font-weight:700">店舗一覧（'+f.tenants.length+'店）</div><ul class="tn">'+f.tenants.map(function(t){return '<li><span class="mono no">'+esc(t.no)+'</span><span class="grow"><b>'+esc(t.name)+'</b><span class="small muted"> '+esc(t.cat)+'</span></span>'+(t.mark?'<span class="mk">'+esc(t.mark)+'</span>':'')+'</li>'}).join('')+'</ul><div class="note">●フードダイバーシティ対応　★未来型営業施設　◆未来型チャレンジショップ</div>';
     }
@@ -1342,7 +1389,7 @@ setInterval(function(){
 
 /* ---------- boot ---------- */
 setupTicket();placeStaff();renderHome();renderRes();renderWallet();renderStaffStatus();renderStaffLog();renderAnnList();
-setInterval(function(){if(state.tab==='home')renderHome();if(state.mode==='ai'&&state.tab==='map')renderAI()},30000);
+setInterval(function(){renderHours();if(state.tab==='home')renderHome();if(state.tab==='res')renderRes(true);if(state.mode==='ai'&&state.tab==='map')renderAI()},30000); // [修正] 9:00／22:00の境目で表示を自動切替
 })();
 </script>
 
