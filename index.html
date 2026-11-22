@@ -208,6 +208,47 @@ h1,h2,h3,p{margin:0}
 .iso-top{fill:var(--pin-top)} .iso-l{fill:var(--pin-l)} .iso-r{fill:var(--pin-r)}
 .iso-top.c{fill:var(--com-top)} .iso-l.c{fill:var(--com-l)} .iso-r.c{fill:var(--com-r)}
 .pin{cursor:pointer}
+/* [改修] 建物フットプリント・情報ユニット・凡例・スポットライト */
+:root{--sage:#dde8d4;--path:#fbfaf6;--path-edge:#e3dfd4;--bld-n:#ffffff;--bld-com:#e6f5f2;--bld-mkt:#fff3e6;--bld-line:#cbd5e1;--bld-shadow:rgba(30,40,70,.16);--bld-op:.32;--hatch:rgba(150,80,10,.5);--zone-op:.38;--st-ticket-ink:#8a5d00}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sage:#22342b;--path:#2a3550;--path-edge:#222c44;--bld-n:#1c263b;--bld-com:#1d3b3a;--bld-mkt:#3b2d1e;--bld-line:#3a4866;--bld-shadow:rgba(0,0,0,.5);--bld-op:.46;--hatch:rgba(255,205,150,.55);--zone-op:.5;--st-ticket-ink:#f0b429}}
+:root[data-theme="dark"]{--sage:#22342b;--path:#2a3550;--path-edge:#222c44;--bld-n:#1c263b;--bld-com:#1d3b3a;--bld-mkt:#3b2d1e;--bld-line:#3a4866;--bld-shadow:rgba(0,0,0,.5);--bld-op:.46;--hatch:rgba(255,205,150,.55);--zone-op:.5;--st-ticket-ink:#f0b429}
+.bfill{vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.bshadow{fill:var(--bld-shadow);stroke:none}
+/* [OSM] 実測ベースマップ：園路はオフホワイト、緑地は淡いセージ、建物は白＋極細グレー線＋影 */
+.o-green path{fill:var(--sage)}
+.o-water path{fill:var(--sea)}
+.o-parea path{fill:var(--path);stroke:var(--path-edge);stroke-width:.6}
+.o-pped path{fill:none;stroke:var(--path);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.o-pfoot path{fill:none;stroke:var(--path);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.o-bld path{fill:var(--bld-n);stroke:var(--bld-line);stroke-width:1px;vector-effect:non-scaling-stroke;fill-rule:evenodd}
+.o-bshadow path{fill:var(--bld-shadow);fill-rule:evenodd}
+.t.spt2{font-family:var(--f-mono);font-weight:700}
+.btint{fill-opacity:.4;stroke:none;pointer-events:none}
+.spill{stroke:var(--surface);stroke-width:1.5px}
+.spt{fill:#fff;font-weight:800;font-family:var(--f-mono)}.spt.dk{fill:#1a1200}
+.t.sub{fill:var(--accent);font-weight:800}
+.bfill.tint{fill-opacity:var(--bld-op)}
+.bhatch{fill:url(#hatch);stroke:none;pointer-events:none}
+.bdeco{fill:none;stroke:var(--bld-line);stroke-width:1px;vector-effect:non-scaling-stroke;opacity:.7;pointer-events:none}
+.ubg{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.ubg.res{stroke:var(--accent);stroke-width:2}
+.ut{font-family:var(--f-body);font-weight:800;fill:var(--ink)}
+.us{font-family:var(--f-mono);font-weight:700;fill:var(--ink-2)}
+.t.bin{font-weight:900}.t.bin.res{fill:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:center;max-width:calc(100% - 90px);padding:4px 10px;border-radius:99px;bottom:24px} /* [整理] 1行の状態ドット */
+.lg-dot{display:inline-block;width:9px;height:9px;border-radius:50%}
+.lg-more{display:flex;flex-wrap:wrap;gap:2px 6px;align-items:center;font-weight:600}
+.lg-t{border:0;background:none;font:inherit;font-weight:800;color:var(--ink);padding:2px 0;min-height:24px;cursor:pointer}
+.lg-t::after{content:" ▾"}.lg-t[aria-expanded="true"]::after{content:" ▴"}
+.lg-b{display:grid;gap:2px}
+.lg-h{font-size:9.5px;color:var(--ink-2);margin-top:4px}
+.lg-bar{display:inline-block;width:4px;height:12px;border-radius:2px}
+.lg-sw{display:inline-block;width:13px;height:10px;border-radius:3px;opacity:.55;border:1px solid var(--line)}
+.lg-sw.hatch{opacity:1;background:repeating-linear-gradient(45deg,var(--hatch) 0 1.4px,transparent 1.4px 4px)}
+.chip.spot{border-color:var(--accent);color:var(--accent)}
+.chip.spot[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip-sep{flex:none;width:1px;align-self:stretch;margin:4px 2px;background:var(--line)}
+#modeSeg button{font-size:11.5px;line-height:1.2;padding-inline:2px;letter-spacing:-.02em;white-space:nowrap}
 .flash circle.b-free,.flash circle.b-ticket,.flash circle.b-closed,.flash circle.b-wait{animation:ping 1.1s ease-out 3;transform-box:fill-box;transform-origin:center}
 @keyframes ping{0%{transform:scale(1)}40%{transform:scale(1.9)}100%{transform:scale(1)}}
 .pulse{animation:pulse 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}
@@ -371,9 +412,10 @@ h1,h2,h3,p{margin:0}
               <input id="q" type="search" placeholder="柱番号・施設・国名・設備（例：45／給水機／先着のみ）" aria-label="柱番号、施設名、国名、設備、運用区分で検索" enterkeyhint="search">
               <button type="submit">検索</button>
             </form>
-            <div class="seg" id="modeSeg" role="group" aria-label="表示モード">
-              <button data-mode="easy" aria-pressed="true">かんたん観光</button>
-              <button data-mode="gachi" aria-pressed="false">現場ガチ攻略</button>
+            <div class="seg" id="modeSeg" role="group" aria-label="表示レイヤー">
+              <!-- [改修] 3層レイヤー：空間・ランドマーク／入場・混雑攻略（既定）／AIおまかせ -->
+              <button data-mode="l1" aria-pressed="false">空間・ランドマーク</button>
+              <button data-mode="l2" aria-pressed="true">入場・混雑攻略</button>
               <button data-mode="ai" aria-pressed="false">AIおまかせ</button>
             </div>
             <div class="chips" id="infra" role="group" aria-label="インフラ表示"></div>
@@ -792,8 +834,8 @@ function hasTag(f){return !!(state.tagFilter&&f.tags&&f.tags.indexOf(state.tagFi
 function dimOf(f){return state.tagFilter&&(f.kind==='pav'||f.kind==='com')&&!hasTag(f)}
 
 var state={
-  tab:'home',mode:'easy',infra:{wc:false,water:false,fountain:false,term:true,center:false,elev:false,aid:false,conv:false,baby:false,kitchen:false,batt:false},
-  layer:{tags:true,pillars:true},tagFilter:null, /* [追加] レイヤー表示と運用区分フィルター */
+  tab:'home',mode:'l2',spot:null, /* [改修] mode: l1｜l2｜ai、spot: 目的別スポットライト */infra:{wc:false,water:false,fountain:false,term:false,center:false,elev:false,aid:false,conv:false,baby:false,kitchen:false,batt:false},
+  layer:{tags:false,pillars:true} /* [整理] 初期は入場区分の色・当日予約端末ともOFF */,tagFilter:null, /* [追加] レイヤー表示と運用区分フィルター */
   fac:{},anns:[],log:[],last:null,me:{x:950,y:470},route:null,found:null,moveMe:false,
   res:[],lottery:[],balance:12800,points:150,stamps:{jp:1},hist:[],demo:true,rs:'pre',onlyOpen:true,wtab:'pay'
 };
@@ -1109,35 +1151,43 @@ var svg=$('#mapsvg'),worldG=$('#world'),overG=$('#wover'),layerG=$('#layer');
 var view={s:.5,tx:0,ty:0,s0:.5,sMin:.2,sMax:6,w:0,h:0,init:false};
 var pinNodes=[],lastLvl=-1,anim=0;
 var ZCOL={L:'#3aa13a',C:'#29b6e6',W:'#1f75bd',E:'#e8352e',F:'#8aa91a',S:'#f26a1b',X:'#8b3fb5',P:'#15a36a'};
-function lvlOf(){var s=view.s;return s<0.6?0:(s<1.2?1:(s<2.2?2:3))}
+/* [改修] 表示段階を5段階に（衝突判定は各段階の最小倍率 LVL_MIN で行う） */
+var LVL_MIN=[0,0.6,1.2,2.2,3.6];
+/* 衝突判定用の細かい段階（この境目をまたいだときだけ #layer を再構築。段階内では倍率差が小さいので空きを無駄にしない） */
+var TIER_MIN=[0,.45,.6,.75,.95,1.2,1.45,1.75,2.2,2.7,3.6,4.6,6];var lastTier=-1;
+function tierOf(){var t=0;for(var i=1;i<TIER_MIN.length;i++)if(view.s>=TIER_MIN[i])t=i;return t}
+function lvlOf(){var s=view.s;return s<0.6?0:(s<1.2?1:(s<2.2?2:(s<3.6?3:4)))}
 function pstr(a){return a.map(function(p){return p[0]+','+p[1]}).join(' ')}
 function buildWorld(){
   var h='<rect x="-3000" y="-3000" width="7000" height="7000" style="fill:var(--sea)"/>';
   h+='<polygon points="'+pstr(LAND)+'" style="fill:var(--land);stroke:var(--wood-line);stroke-opacity:.35" stroke-width="2" stroke-linejoin="round"/>';
-  h+='<polygon points="'+pstr(ZONES.Cout)+'" style="fill:var(--zC)" fill-opacity=".8"/>';
-  h+='<polygon points="'+pstr(ZONES.W)+'" style="fill:var(--zW)" fill-opacity=".8"/>';
-  h+='<polygon points="'+pstr(ZONES.L)+'" style="fill:var(--zL)" fill-opacity=".85" stroke-linejoin="round"/>';
-  h+='<polygon points="'+pstr(ZONES.E)+'" style="fill:var(--zE)" fill-opacity=".85" stroke-linejoin="round"/>';
-  h+='<circle cx="'+C.x+'" cy="'+C.y+'" r="'+(RING_R-12)+'" style="fill:var(--zC)" fill-opacity=".8"/>';
-  h+='<polygon points="'+pstr(ZONES.P)+'" style="fill:var(--zP)" fill-opacity=".85" stroke-linejoin="round"/>';
-  h+='<polygon points="'+pstr(ZONES.S)+'" style="fill:var(--zS)" fill-opacity=".9" stroke-linejoin="round"/>';
-  h+='<polygon points="'+pstr(ZONES.X)+'" style="fill:var(--zX)" fill-opacity=".9" stroke-linejoin="round"/>';
-  h+='<ellipse cx="835" cy="575" rx="88" ry="58" style="fill:var(--zF)" fill-opacity=".9"/>';
-  h+='<text x="818" y="575" text-anchor="middle" class="t" font-size="15" font-weight="700" style="fill:var(--ink-2)">静けさの森</text>';
+  var zo=OSM.ready?'.14':'var(--zone-op)'; /* [OSM] 実測データ表示中はゾーン色をごく薄く */
+  h+='<polygon points="'+pstr(ZONES.Cout)+'" style="fill:var(--zC);fill-opacity:'+zo+'"/>';
+  h+='<polygon points="'+pstr(ZONES.W)+'" style="fill:var(--zW);fill-opacity:'+zo+'"/>';
+  h+='<polygon points="'+pstr(ZONES.L)+'" style="fill:var(--zL);fill-opacity:'+zo+'" stroke-linejoin="round"/>';
+  h+='<polygon points="'+pstr(ZONES.E)+'" style="fill:var(--zE);fill-opacity:'+zo+'" stroke-linejoin="round"/>';
+  h+='<circle cx="'+C.x+'" cy="'+C.y+'" r="'+(RING_R-12)+'" style="fill:var(--zC);fill-opacity:'+zo+'"/>';
+  h+='<polygon points="'+pstr(ZONES.P)+'" style="fill:var(--zP);fill-opacity:'+zo+'" stroke-linejoin="round"/>';
+  h+='<polygon points="'+pstr(ZONES.S)+'" style="fill:var(--zS);fill-opacity:'+zo+'" stroke-linejoin="round"/>';
+  h+='<polygon points="'+pstr(ZONES.X)+'" style="fill:var(--zX);fill-opacity:'+zo+'" stroke-linejoin="round"/>';
+  if(!OSM.ready)h+='<ellipse cx="835" cy="575" rx="88" ry="58" style="fill:var(--zF);fill-opacity:'+zo+'"/>';
+  if(OSM.ready)h+=osmWorldSVG(); /* [OSM] 緑地・水辺・園路・実測の建物フットプリント */
   h+='<circle cx="'+C.x+'" cy="'+C.y+'" r="'+RING_R+'" fill="none" style="stroke:var(--wood)" stroke-width="36"/>';
   h+='<circle cx="'+C.x+'" cy="'+C.y+'" r="'+(RING_R+18)+'" fill="none" style="stroke:var(--wood-line)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>';
   h+='<circle cx="'+C.x+'" cy="'+C.y+'" r="'+(RING_R-18)+'" fill="none" style="stroke:var(--wood-line)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>';
   var d='',i,a,p1,p2;
   for(i=1;i<=PILLARS;i++){a=258.2+(i-1)*360/PILLARS;var L=(i%10===0||i===1)?14:8;p1=ringPos(RING_R+19,a);p2=ringPos(RING_R+19+L,a);d+='M'+p1[0].toFixed(1)+' '+p1[1].toFixed(1)+'L'+p2[0].toFixed(1)+' '+p2[1].toFixed(1)}
   h+='<path d="'+d+'" fill="none" style="stroke:var(--wood-line)" stroke-width="2.4" stroke-linecap="round"/>';
-  h+='<text x="'+C.x+'" y="'+(C.y+RING_R+5)+'" text-anchor="middle" class="t" font-size="16" font-weight="700" letter-spacing="4" style="fill:var(--ink)">大屋根リング</text>';
+  /* [改修] 飲食ありの斜線ハッチ（SVG pattern）と建物フットプリント層 */
+  h+='<defs><pattern id="hatch" patternUnits="userSpaceOnUse" width="3.2" height="3.2" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="3.2" style="stroke:var(--hatch)" stroke-width="1.1"/></pattern></defs>';
+  h+='<g id="buildings"></g>';
   worldG.innerHTML=h;
 }
 function applyView(){
   worldG.setAttribute('transform','translate('+view.tx.toFixed(2)+' '+view.ty.toFixed(2)+') scale('+view.s.toFixed(4)+')');
   overG.setAttribute('transform',worldG.getAttribute('transform'));
   for(var i=0;i<pinNodes.length;i++){var n=pinNodes[i];n.el.setAttribute('transform','translate('+(n.x*view.s+view.tx).toFixed(1)+' '+(n.y*view.s+view.ty).toFixed(1)+')')}
-  var l=lvlOf();if(l!==lastLvl){lastLvl=l;buildPins()}
+  var l=lvlOf(),t=tierOf();if(l!==lastLvl||t!==lastTier){lastLvl=l;lastTier=t;buildPins()} // [改修]
 }
 function fitScale(b,w,avail){return Math.min(w/(b[2]-b[0]),avail/(b[3]-b[1]))*0.97}
 function mapResize(){
@@ -1166,85 +1216,491 @@ function pinG(id,wx,wy,inner,extra){return '<g class="pin" data-id="'+id+'" data
 function recIds(){return state.recs?state.recs.map(function(r){return r.f.id}):[]}
 function lab(txt,x,y,fs,w,anchor){return '<text class="t" x="'+x+'" y="'+y+'" font-size="'+fs+'" font-weight="'+(w||700)+'" text-anchor="'+(anchor||'start')+'">'+esc(txt)+'</text>'}
 function pill(f,fs){var w=Math.max(54,f.name.length*(fs+1)+22);return '<rect x="'+(-w/2)+'" y="-12" width="'+w+'" height="24" rx="12" style="fill:var(--ink)"/><text class="bt" y="4.5" font-size="'+fs+'" text-anchor="middle" style="fill:var(--bg)">'+esc(f.name)+'</text>'}
+/* =====================================================================
+   [改修] 会場マップ：建物フットプリント／ラベル衝突回避／3層レイヤー＋スポットライト
+   ・建物ポリゴンは #world > #buildings（ワールド座標）に描画し、パン・ズームは transform 一括で追従
+   ・文字とピンだけを #layer（スクリーン座標）に置き、lvlOf() が変わったときだけ再構築
+   ===================================================================== */
+
+/* --- 建物の形状データ（pos を中心に、shape／size[幅,奥行]（地図px）／rot（度）／food） --- */
+/* 特徴的な建築：円形・ドーム・複数棟などのシルエット */
+var BLD_SHAPES={
+  '日本館':{shape:'ring',size:[42,42]},
+  'EXPOホール「シャインハット」':{shape:'hat',size:[34,34]},
+  'ガスパビリオン おばけワンダーランド':{shape:'cloud',size:[24,18]},
+  'オランダ館':{shape:'sun',size:[22,22]},
+  'BLUE OCEAN DOME（ブルーオーシャン・ドーム）':{shape:'domes',size:[28,22]},
+  '電力館 可能性のタマゴたち':{shape:'egg',size:[17,23]},
+  'いのちの遊び場 クラゲ館':{shape:'jelly',size:[24,21]},
+  '飯田グループ×大阪公立大学 共同出展館':{shape:'multi',size:[22,15]},
+  'いのち動的平衡館':{shape:'circle',size:[19,19]},
+  'null²':{shape:'rect',size:[15,15],rot:0},
+  'EXPO アリーナ「Matsuri」':{shape:'circle',size:[34,34]},
+  'EXPO メッセ「WASSE」':{shape:'rect',size:[46,34],rot:0},
+  '万博サウナ「太陽のつぼみ」':{shape:'circle',size:[14,14]}
+};
+/* 敷地規模の大きい館：大型の角丸矩形 */
+var BLD_BIG=['アメリカ合衆国館','フランス館','イタリア館','サウジアラビア館','ドイツ館','大韓民国館','中華人民共和国館','関西パビリオン','大阪ヘルスケアパビリオン Nest for Reborn','住友館','GUNDAM NEXT FUTURE PAVILION','三菱未来館','パナソニックグループパビリオン「ノモの国」','NTTパビリオン','英国館','オーストラリア館','スペイン館'];
+/* 飲食提供あり（有志マップ Ver.2.24 で「飲食の提供あり」枠のついた施設）。マーケットプレイスは全件 food */
+var BLD_FOOD=['飯田グループ×大阪公立大学 共同出展館','TECH WORLD','ORA外食パビリオン『宴〜UTAGE〜』','スペイン館','インド館','インドネシア館','サウジアラビア館','タイ館','トルコ館','モナコ館','セルビア館','コモンズ館B','アゼルバイジャン館','大韓民国館','ドイツ館','ルクセンブルク館','ネパール館','コモンズ館A','マレーシア館','アイルランド館','ヨルダン館','ペルー館','モザンビーク館','フィリピン館','アメリカ合衆国館','フランス館','クウェート館','ブラジル館','カタール館','アラブ首長国連邦館','オーストリア館','スイス館','カナダ館','コロンビア館','ポルトガル館','ベトナム館','チェコ館','北欧館','バーレーン館','マルタ館','トルクメニスタン館','ベルギー館','イタリア館','オマーン館','コモンズ館E','シンガポール館','ブルガリア館','ハンガリー館','オランダ館','ルーマニア館','ポーランド館','英国館','アンゴラ館','大阪ヘルスケアパビリオン Nest for Reborn','住友館','ウーマンズ パビリオン in collaboration with Cartier'];
+/* 入場・予約区分の塗り色（STYLE / tags から決定） */
+var BCAT={
+  res:{c:'#1f9d55',l:'予約のみ'},principle:{c:'#0f8b8d',l:'原則予約'},both:{c:'#7a3fc4',l:'先着・予約'},
+  sameday:{c:'#1e6fd9',l:'当日予約あり'},first:{c:'#d63384',l:'先着のみ'},free:{c:'#6b7a99',l:'自由入場ほか'},mkt:{c:'#e07b1a',l:'マーケット'}
+};
+function catOf(f){
+  if(f.kind==='mkt')return 'mkt';
+  var t=f.tags||[],o=['res','principle','both','sameday','first'];
+  for(var i=0;i<o.length;i++)if(t.indexOf(o[i])>=0)return o[i];
+  return f.style==='o'?'res':f.style==='d'?'both':'free';
+}
+var BLD=[];
+function bShrink(f,k){f.size=[f.size[0]*k,f.size[1]*k];f.br*=k;if(f.rr)f.rr*=k}
+function initBuildings(){
+  BLD=F.filter(function(f){return f.kind==='pav'||f.kind==='com'||f.kind==='mkt'||(f.kind==='venue'&&f.g!=='ス')||(f.kind==='venue'&&BLD_SHAPES[f.name])});
+  BLD.forEach(function(f){
+    var sp=BLD_SHAPES[f.name]||{};
+    var base=f.kind==='com'?[38,27]:f.kind==='mkt'?[24,14]:f.kind==='venue'?[15,11]:BLD_BIG.indexOf(f.name)>=0?[32,24]:f.top?[27,20]:f.major?[23,17]:[19,14];
+    f.shape=sp.shape||(f.kind==='com'?'com':'rect');
+    f.size=(sp.size||base).slice();
+    var dx=f.pos[0]-C.x,dy=f.pos[1]-C.y,dc=Math.sqrt(dx*dx+dy*dy);
+    /* リング沿いの施設はリング中心 C に向けて自動回転（接線方向に長辺） */
+    f.rot=sp.rot!=null?sp.rot:((dc>110&&dc<RING_R+140)?Math.atan2(dy,dx)*180/Math.PI+90:0);
+    while(f.rot>90)f.rot-=180;while(f.rot<=-90)f.rot+=180;
+    f.food=f.kind==='mkt'||BLD_FOOD.indexOf(f.name)>=0;
+    var round=['circle','ring','hat','sun'].indexOf(f.shape)>=0;
+    f.br=round?Math.max(f.size[0],f.size[1])/2:Math.sqrt(f.size[0]*f.size[0]+f.size[1]*f.size[1])/2; // 外接円（リング・ラベル位置用）
+    f.rr=round?f.br:(f.size[0]+f.size[1])/4; // 平均半径（隣接館との間隔用）
+    /* 大屋根リングの帯（幅36）に食い込まないよう縮小 */
+    var lim=Infinity;if(dc<RING_R-18)lim=RING_R-18-dc-1;else if(dc>RING_R+18)lim=dc-RING_R-18-1;
+    if(lim<f.br)bShrink(f,Math.max(lim,3)/f.br);
+  });
+  /* 隣接する建物どうしが重ならないよう、平均半径で比例縮小（大きい館は大きいまま） */
+  for(var pass=0;pass<5;pass++){
+    for(var i=0;i<BLD.length;i++)for(var j=i+1;j<BLD.length;j++){
+      var a=BLD[i],b=BLD[j],d=Math.sqrt(Math.pow(a.pos[0]-b.pos[0],2)+Math.pow(a.pos[1]-b.pos[1],2));
+      if(d<1)continue;
+      if(a.rr+b.rr>0.97*d){var k=0.97*d/(a.rr+b.rr);bShrink(a,k);bShrink(b,k)}
+    }
+  }
+}
+initBuildings();
+
+/* --- 図形（中心0,0・未回転）。cls と style を全パーツに付ける --- */
+function shapeSVG(f,attr){
+  var w=f.size[0],h=f.size[1],r=Math.min(w,h)/2,A=' '+attr,n=function(v){return v.toFixed(2)};
+  switch(f.shape){
+    case 'osm':return '<path d="'+f.opath+'" fill-rule="evenodd"'+A+'/>'; /* [OSM] 実測の建物ポリゴン */
+    case 'circle':case 'ring':case 'sun':return '<circle r="'+n(w/2)+'"'+A+'/>';
+    case 'hat':return '<circle r="'+n(w/2)+'"'+A+'/>';
+    case 'egg':return '<ellipse rx="'+n(w/2)+'" ry="'+n(h/2)+'"'+A+'/>';
+    case 'domes':return '<circle cx="'+n(-w*.26)+'" cy="'+n(h*.14)+'" r="'+n(h*.33)+'"'+A+'/><circle cx="'+n(w*.24)+'" cy="'+n(h*.1)+'" r="'+n(h*.37)+'"'+A+'/><circle cx="'+n(-w*.02)+'" cy="'+n(-h*.2)+'" r="'+n(h*.3)+'"'+A+'/>';
+    case 'cloud':return '<path d="M'+n(-w*.42)+' '+n(h*.3)+'C'+n(-w*.62)+' '+n(-h*.05)+' '+n(-w*.3)+' '+n(-h*.5)+' '+n(-w*.05)+' '+n(-h*.35)+'C'+n(w*.1)+' '+n(-h*.62)+' '+n(w*.52)+' '+n(-h*.4)+' '+n(w*.44)+' '+n(-h*.02)+'C'+n(w*.6)+' '+n(h*.22)+' '+n(w*.35)+' '+n(h*.55)+' '+n(w*.1)+' '+n(h*.4)+'C'+n(-w*.08)+' '+n(h*.6)+' '+n(-w*.35)+' '+n(h*.55)+' '+n(-w*.42)+' '+n(h*.3)+'Z"'+A+'/>';
+    case 'jelly':return '<path d="M'+n(-w/2)+' '+n(h*.12)+'A'+n(w/2)+' '+n(h*.6)+' 0 0 1 '+n(w/2)+' '+n(h*.12)+'Q'+n(w*.4)+' '+n(h*.45)+' '+n(w*.25)+' '+n(h*.3)+'Q'+n(w*.12)+' '+n(h*.55)+' 0 '+n(h*.32)+'Q'+n(-w*.12)+' '+n(h*.55)+' '+n(-w*.25)+' '+n(h*.3)+'Q'+n(-w*.4)+' '+n(h*.45)+' '+n(-w/2)+' '+n(h*.12)+'Z"'+A+'/>';
+    case 'multi':return '<rect x="'+n(-w/2)+'" y="'+n(-h/2)+'" width="'+n(w*.56)+'" height="'+n(h)+'" rx="'+n(r*.3)+'"'+A+'/><rect x="'+n(w*.1)+'" y="'+n(-h*.32)+'" width="'+n(w*.4)+'" height="'+n(h*.72)+'" rx="'+n(r*.3)+'"'+A+'/>';
+    case 'com':return '<rect x="'+n(-w/2)+'" y="'+n(-h/2)+'" width="'+n(w)+'" height="'+n(h)+'" rx="'+n(r*.18)+'"'+A+'/>';
+    default:return '<rect x="'+n(-w/2)+'" y="'+n(-h/2)+'" width="'+n(w)+'" height="'+n(h)+'" rx="'+n(r*.42)+'"'+A+'/>';
+  }
+}
+function shapeDeco(f){ /* 形の特徴（内側の線）。塗りなし・細線 */
+  var w=f.size[0],h=f.size[1],n=function(v){return v.toFixed(2)},a=' class="bdeco"';
+  if(f.shape==='ring')return '<circle r="'+n(w*.3)+'"'+a+'/><circle r="'+n(w*.42)+'"'+a+' stroke-dasharray="1.2 1.2"/>';
+  if(f.shape==='hat')return '<circle r="'+n(w*.27)+'"'+a+'/>';
+  if(f.shape==='sun')return '<circle r="'+n(w*.33)+'"'+a+'/>';
+  if(f.shape==='com')return '<rect x="'+n(-w/2+2)+'" y="'+n(-h/2+2)+'" width="'+n(w-4)+'" height="'+n(h-4)+'" rx="1.5"'+a+' stroke-dasharray="2 1.4"/>';
+  return '';
+}
+
+/* --- 状態テキスト・優先度・スポットライト --- */
+function stText(s){if(!s)return '';var w=s.wait;return s.st==='free'?(w?'自由 '+w+'分':'自由'):s.st==='ticket'?'整理券'+(w!=null?' '+w+'分':''):s.st==='closed'?'受付終了':'待ち'+(w!=null?' '+w+'分':'')}
+function resIds(){var o={};state.res.forEach(function(r){if(r.kind!=='wait')o[r.fid]=r});return o}
+function soonPlan(){ /* 直近1時間以内に当日予約開放・ショーがある施設／ショー */
+  var now=Date.now(),lim=now+3600000,ids={},shows=[];
+  if(!isOpenNow())return {ids:ids,shows:shows};
+  SCHED.forEach(function(i){var st=schedTs(i),en=hm2ts(item_end(i));if(en<now||st>lim)return;if(i.f)ids[i.f.id]=i;else if(i.s&&i.s.pos)shows.push(i)});
+  return {ids:ids,shows:shows};
+}
+var SPOTS=[
+  {k:'now',label:'今すぐ入れる',icon:'<path d="M5 12l5 5L20 7"/>'},
+  {k:'plan',label:'予約済み・予定',icon:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 3h6"/>'},
+  {k:'food',label:'食事・カフェ',icon:'<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 3c-2 1-3 4-3 7h3v11"/>'},
+  {k:'rest',label:'トイレ・給水・休憩',icon:'<path d="M12 3c3 4.5 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-6.5 6-11z"/>'}
+];
+var SPOT_INFRA={food:['kitchen'],rest:['wc','water','fountain','aid']};
+function infraOn(k){return !!state.infra[k]||!!(state.spot&&SPOT_INFRA[state.spot]&&SPOT_INFRA[state.spot].indexOf(k)>=0)}
+function spotMatch(f,ctx){
+  var sp=state.spot;if(!sp)return true;
+  if(sp==='now')return (f.kind==='pav'||f.kind==='com')&&!!state.fac[f.id]&&(state.fac[f.id].st==='free'||state.fac[f.id].st==='ticket');
+  if(sp==='plan')return !!(ctx.res[f.id]||ctx.plan.ids[f.id]);
+  if(sp==='food')return !!f.food;
+  return false;
+}
+/* 減光（0.2）：スポットライト対象外、または運用区分フィルター対象外 */
+function bOpacity(f,ctx){
+  if(state.mode==='ai')return ctx.recs.indexOf(f.id)>=0?1:.42;
+  if(state.tagFilter&&(f.kind==='pav'||f.kind==='com')&&!hasTag(f))return .25;
+  if(state.spot==='rest')return .45;
+  if(state.spot&&!spotMatch(f,ctx))return .25; /* 対象外は 0.25 */
+  return 1;
+}
+function prioOf(f,ctx){
+  if(ctx.res[f.id])return 1;
+  if((state.spot&&state.spot!=='rest'&&spotMatch(f,ctx))||hasTag(f))return 2;
+  if(f.top)return 3;if(f.major)return 4;return 5;
+}
+
+/* =====================================================================
+   [OSM] OpenStreetMap 実測ベクターデータによるベースマップ
+   ・起動時に localStorage のキャッシュを確認 → あれば即描画、なければ Overpass API から非同期取得
+   ・緯度経度 → アプリ座標は「大屋根リングの中心と半径が C／RING_R に一致する」相似変換（拡大縮小＋平行移動）
+   ・取得できない場合は従来の概略図（LAND・ZONES・建物シルエット）のまま表示（フォールバック）
+   地図データ © OpenStreetMap contributors（ODbL）
+   ===================================================================== */
+var OSM_URL='https://overpass-api.de/api/interpreter';
+var OSM_KEY='expo2025-osm',OSM_VER=4,OSM_TTL=30*864e5;
+var OSM_RING_DEFAULT={lat:34.6499,lon:135.3889,r:322}; /* 大屋根リング中心線の半径（m）：内径約615m＋幅30mの中心 */
+var OSM={ready:false,status:'idle',data:null};
+(function(){
+  var b='(34.642,135.375,34.662,135.405)';
+  OSM.query='[out:json][timeout:90];('+
+    'way["building"]'+b+';relation["building"]'+b+';'+
+    'way["natural"="water"]'+b+';relation["natural"="water"]'+b+';way["waterway"]'+b+';'+
+    'way["leisure"~"^(park|garden|playground|pitch)$"]'+b+';relation["leisure"~"^(park|garden)$"]'+b+';'+
+    'way["landuse"~"^(grass|forest|meadow|village_green|recreation_ground)$"]'+b+';way["natural"~"^(wood|scrub|grassland)$"]'+b+';'+
+    'way["highway"~"^(pedestrian|footway|path|steps|living_street|cycleway)$"]'+b+';'+
+    'way["name"~"大屋根リング|Grand Ring",i]'+b+';relation["name"~"大屋根リング|Grand Ring",i]'+b+';'+
+    ');out geom;';
+})();
+/* --- 種別の判定 --- */
+function osmClass(t){
+  t=t||{};var n=t.name||t['name:ja']||t['name:en']||'';
+  if(/大屋根リング|grand\s*ring/i.test(n))return 'ring';
+  if(t.building&&t.building!=='no')return 'b';
+  if(t.natural==='water'||t.water||t.waterway==='riverbank')return 'w';
+  if(t.waterway)return 'wl';
+  if(t.highway){var hw=t.highway;if(t.area==='yes')return 'pa'; /* 閉じた道路は area=yes のときだけ面（OSMの慣習） */return hw==='pedestrian'||hw==='living_street'?'pp':'pf'}
+  if(t.leisure||t.landuse||t.natural)return 'g';
+  return null;
+}
+/* --- 外周リングの組み立て（relation の分割された member way を端点でつなぐ） --- */
+function osmRings(e){
+  if(e.type==='way')return e.geometry?[e.geometry]:[];
+  var segs=(e.members||[]).filter(function(m){return m.type==='way'&&m.geometry&&m.geometry.length>1}).map(function(m){return m.geometry.slice()});
+  var out=[],same=function(a,b){return Math.abs(a.lat-b.lat)<1e-7&&Math.abs(a.lon-b.lon)<1e-7};
+  while(segs.length){
+    var cur=segs.shift(),guard=0;
+    while(!same(cur[0],cur[cur.length-1])&&guard++<500){
+      var k=-1,rev=false;
+      for(var i=0;i<segs.length;i++){var s=segs[i];
+        if(same(cur[cur.length-1],s[0])){k=i;break}
+        if(same(cur[cur.length-1],s[s.length-1])){k=i;rev=true;break}}
+      if(k<0)break;var nx=segs.splice(k,1)[0];if(rev)nx.reverse();cur=cur.concat(nx.slice(1));
+    }
+    out.push(cur);
+  }
+  return out;
+}
+/* --- Overpass JSON → アプリ座標の軽量データ（キャッシュ用） --- */
+function osmProcess(json){
+  var els=(json&&json.elements)||[],ringPts=[];
+  els.forEach(function(e){if(osmClass(e.tags)==='ring')osmRings(e).forEach(function(r){r.forEach(function(p){ringPts.push(p)})})});
+  var lat0=OSM_RING_DEFAULT.lat,lon0=OSM_RING_DEFAULT.lon,rM=OSM_RING_DEFAULT.r,src='default';
+  if(ringPts.length>=12){
+    var mnA=1e9,mxA=-1e9,mnO=1e9,mxO=-1e9;
+    ringPts.forEach(function(p){mnA=Math.min(mnA,p.lat);mxA=Math.max(mxA,p.lat);mnO=Math.min(mnO,p.lon);mxO=Math.max(mxO,p.lon)});
+    var la=(mnA+mxA)/2,lo=(mnO+mxO)/2,kx0=Math.cos(la*Math.PI/180)*111320,sum=0;
+    ringPts.forEach(function(p){sum+=Math.sqrt(Math.pow((p.lon-lo)*kx0,2)+Math.pow((p.lat-la)*110574,2))});
+    var r=sum/ringPts.length;
+    if(r>200&&r<450&&Math.abs(la-lat0)<.01&&Math.abs(lo-lon0)<.01){lat0=la;lon0=lo;rM=r;src='osm'} /* リングの実測から中心・半径を決定 */
+  }
+  var kx=Math.cos(lat0*Math.PI/180)*111320,ky=110574,k=RING_R/rM;
+  var P=function(p){return [Math.round((C.x+(p.lon-lon0)*kx*k)*10)/10,Math.round((C.y-(p.lat-lat0)*ky*k)*10)/10]};
+  var f=[];
+  els.forEach(function(e){
+    var t=e.tags||{};
+    var rings=osmRings(e);if(!rings.length)return;
+    t._closed=rings.length&&rings[0].length>3&&rings[0][0].lat===rings[0][rings[0].length-1].lat&&rings[0][0].lon===rings[0][rings[0].length-1].lon;
+    var c=osmClass(t);if(!c)return;
+    var flat=rings.map(function(r){var a=[];r.forEach(function(p){var q=P(p);a.push(q[0],q[1])});return a});
+    var o={c:c,r:flat};var n=t['name:ja']||t.name;if(n)o.n=n;
+    if(c==='pf'&&(t.highway==='steps'||t.highway==='path'))o.w=1;
+    f.push(o);
+  });
+  return {v:OSM_VER,t:Date.now(),lat0:lat0,lon0:lon0,rM:Math.round(rM),src:src,f:f};
+}
+/* --- 図形ユーティリティ --- */
+function ringPathD(a,close){var d='';for(var i=0;i<a.length;i+=2)d+=(i?'L':'M')+a[i]+' '+a[i+1];return d+(close?'Z':'')}
+function ringArea(a){var s=0;for(var i=0;i<a.length-2;i+=2)s+=a[i]*a[i+3]-a[i+2]*a[i+1];return Math.abs(s)/2}
+function inRing(x,y,a){var c=false;for(var i=0,j=a.length-2;i<a.length;j=i,i+=2){var xi=a[i],yi=a[i+1],xj=a[j],yj=a[j+1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c}
+function ringBBox(a){var b=[1e9,1e9,-1e9,-1e9];for(var i=0;i<a.length;i+=2){b[0]=Math.min(b[0],a[i]);b[1]=Math.min(b[1],a[i+1]);b[2]=Math.max(b[2],a[i]);b[3]=Math.max(b[3],a[i+1])}return b}
+/* --- 実測建物と施設データの対応づけ（名前一致 → 施設座標を含む建物 → 近い建物の順） --- */
+function osmMatch(){
+  var bs=OSM.data.f.filter(function(o){return o.c==='b'&&o.r[0]&&o.r[0].length>=6});
+  bs.forEach(function(o){o.bb=ringBBox(o.r[0]);o.ar=ringArea(o.r[0]);o.cx=(o.bb[0]+o.bb[2])/2;o.cy=(o.bb[1]+o.bb[3])/2;o.fid=null});
+  var cand=bs.filter(function(o){return o.ar>4&&o.ar<12000}); /* 大屋根リングなど巨大な建物は対象外 */
+  BLD.forEach(function(f){
+    if(!f.fb)f.fb={shape:f.shape,size:f.size.slice(),rot:f.rot,br:f.br,rr:f.rr}; /* フォールバック用に元の形を保存 */
+    var key=(f.short||f.name).replace(/館$/,''),hit=null,best=1e9;
+    cand.forEach(function(o){if(!o.n||hit)return;var n=o.n.replace(/\s/g,'');if(n===f.name.replace(/\s/g,'')||n===key+'館'||n===key)hit=o});
+    if(!hit)cand.forEach(function(o){if(o.bb[0]<=f.pos[0]&&f.pos[0]<=o.bb[2]&&o.bb[1]<=f.pos[1]&&f.pos[1]<=o.bb[3]&&inRing(f.pos[0],f.pos[1],o.r[0])&&o.ar<best){best=o.ar;hit=o}});
+    if(!hit){best=10;cand.forEach(function(o){if(o.fid)return;var d=Math.sqrt(Math.pow(o.cx-f.pos[0],2)+Math.pow(o.cy-f.pos[1],2));if(d<best){best=d;hit=o}})}
+    if(hit){
+      hit.fid=hit.fid||f.id;f.osm=hit;
+      var d='';hit.r.forEach(function(a){var s='';for(var i=0;i<a.length;i+=2)s+=(i?'L':'M')+(a[i]-f.pos[0]).toFixed(1)+' '+(a[i+1]-f.pos[1]).toFixed(1);d+=s+'Z'});
+      f.shape='osm';f.opath=d;f.rot=0;f.size=[Math.max(2,hit.bb[2]-hit.bb[0]),Math.max(2,hit.bb[3]-hit.bb[1])];
+      f.br=Math.sqrt(f.size[0]*f.size[0]+f.size[1]*f.size[1])/2;f.rr=(f.size[0]+f.size[1])/4;
+    }else if(f.fb){f.shape=f.fb.shape;f.size=f.fb.size.slice();f.rot=f.fb.rot;f.br=f.fb.br;f.rr=f.fb.rr;f.osm=null}
+  });
+}
+function osmUse(p,src){
+  OSM.data=p;
+  try{osmMatch()}catch(e){OSM.data=null;OSM.status='failed';osmNote();return}
+  OSM.ready=true;OSM.status=src;
+  if(view.init){buildWorld();buildPins()}
+  osmNote();
+}
+function osmNote(){
+  var el=$('.mapnote');if(!el)return;
+  el.textContent=OSM.ready?'地図データ © OpenStreetMap contributors（ODbL）／施設位置は公式マップ基準の概略／混雑・予約状況はサンプル'
+    :OSM.status==='loading'?'実測地図を読み込み中…（概略図を表示しています）'
+    :OSM.status==='failed'?'概略図を表示中（実測地図データを取得できませんでした）／混雑・予約状況はサンプル'
+    :'公式マップ（Ver.2）＋有志マップ（Ver.2.24）の情報を基にした概略図／混雑・予約状況はサンプル';
+}
+function osmInit(){
+  if(OSM.status!=='idle')return;
+  var c=null;try{c=JSON.parse(localStorage.getItem(OSM_KEY)||'null')}catch(e){c=null}
+  var valid=c&&c.v===OSM_VER&&c.f&&c.f.length;
+  if(valid){osmUse(c,'cache');if(Date.now()-c.t<OSM_TTL)return} /* キャッシュがあれば即描画（期限切れなら裏で更新） */
+  if(!window.fetch){if(!valid){OSM.status='failed';osmNote()}return}
+  if(!valid){OSM.status='loading';osmNote()}
+  var ctl=window.AbortController?new AbortController():null,to=setTimeout(function(){if(ctl)ctl.abort()},60000);
+  fetch(OSM_URL,{method:'POST',body:'data='+encodeURIComponent(OSM.query),headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:ctl?ctl.signal:undefined})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+    .then(function(j){clearTimeout(to);var p=osmProcess(j);if(!p.f.some(function(o){return o.c==='b'}))throw new Error('no buildings');
+      try{localStorage.setItem(OSM_KEY,JSON.stringify(p))}catch(e){} /* 容量オーバー等は無視（毎回取得になるだけ） */
+      osmUse(p,'net')})
+    .catch(function(){clearTimeout(to);if(!OSM.ready){OSM.status='failed';osmNote()}});
+}
+/* --- OSM ベースマップの描画（#world 内。パン・ズームは transform 一括） --- */
+function osmWorldSVG(){
+  var F2=OSM.data.f,g='',w='',pa='',pl='',pf='',bs='',bsh='';
+  F2.forEach(function(o){
+    if(o.c==='g')g+='<path d="'+o.r.map(function(a){return ringPathD(a,true)}).join('')+'"/>';
+    else if(o.c==='w')w+='<path d="'+o.r.map(function(a){return ringPathD(a,true)}).join('')+'"/>';
+    else if(o.c==='wl')pl+='';
+    else if(o.c==='pa')pa+='<path d="'+o.r.map(function(a){return ringPathD(a,true)}).join('')+'"/>';
+    else if(o.c==='pp')pl+='<path d="'+ringPathD(o.r[0],false)+'"/>';
+    else if(o.c==='pf')pf+='<path d="'+ringPathD(o.r[0],false)+'"'+(o.w?' stroke-width="1.6"':'')+'/>';
+    else if(o.c==='b'&&!o.fid&&o.ar<12000){var d=o.r.map(function(a){return ringPathD(a,true)}).join('');bs+='<path d="'+d+'"/>';bsh+='<path d="'+d+'"/>'}
+  });
+  return '<g class="o-parea">'+pa+'</g><g class="o-green">'+g+'</g><g class="o-water">'+w+'</g><g class="o-pped">'+pl+'</g><g class="o-pfoot">'+pf+'</g>'+
+    '<g id="osmStatic"><g class="o-bshadow" transform="translate(.7 1.1)">'+bsh+'</g><g class="o-bld">'+bs+'</g></g>';
+}
+
+/* --- 建物レイヤー（#world 内）[整理] 白基調＋薄いグレー境界線＋わずかな影。色は「意味があるときだけ」 --- */
+var SPOT_COLOR={food:'#e07b1a',plan:'var(--accent)'};
+function bFill(f,ctx){
+  /* スポットライト・区分フィルターで該当した館だけ色をつける */
+  var s=state.fac[f.id],m=state.mode;
+  if(m==='ai')return null;
+  if(state.spot&&state.spot!=='rest'&&spotMatch(f,ctx)){
+    if(state.spot==='now'&&s)return 'var(--st-'+s.st+')';
+    return SPOT_COLOR[state.spot]||null;
+  }
+  if(state.tagFilter&&hasTag(f))return TAGDEF[state.tagFilter]?TAGDEF[state.tagFilter].color:null;
+  if(m==='l2'&&state.layer.tags&&(f.kind==='pav'||f.kind==='com'))return BCAT[catOf(f)].c;
+  return null;
+}
+function buildBuildings(ctx){
+  var g=$('#buildings');if(!g)return;
+  var mode=state.mode,sh='',h='';
+  BLD.forEach(function(f){
+    var op=bOpacity(f,ctx),tint=bFill(f,ctx),base=f.kind==='com'?'var(--bld-com)':f.kind==='mkt'?'var(--bld-mkt)':'var(--bld-n)';
+    var stroke='var(--bld-line)',sw=1;
+    if(mode==='ai'&&ctx.recs.indexOf(f.id)>=0){stroke='var(--accent)';sw=2.4}
+    else if(ctx.res[f.id]&&mode!=='ai'){stroke='var(--accent)';sw=2}
+    var tr=(f.rot?' rotate('+f.rot.toFixed(1)+')':''),o=op<1?' opacity="'+op+'"':'';
+    /* わずかなドロップシャドウ（右下に半透明の同形を敷く。filter を使わないのでパン・ズームが軽い） */
+    sh+='<g transform="translate('+(f.pos[0]+.7)+' '+(f.pos[1]+1.1)+')'+tr+'"'+o+'>'+shapeSVG(f,'class="bshadow"')+'</g>';
+    h+='<g class="bld pin" data-id="'+f.id+'" transform="translate('+f.pos[0]+' '+f.pos[1]+')'+tr+'"'+o+'>'+shapeSVG(f,'class="bfill" style="fill:'+base+';stroke:'+stroke+';stroke-width:'+sw+'px"');
+    if(tint)h+=shapeSVG(f,'class="btint" style="fill:'+tint+'"');
+    if(state.spot==='food'&&f.food)h+=shapeSVG(f,'class="bhatch"'); /* 斜線は「食事・カフェ」選択時のみ */
+    h+=shapeDeco(f)+'</g>';
+  });
+  g.innerHTML='<g class="bshadows">'+sh+'</g>'+h;
+  var dimAll=mode==='ai'?.42:(state.tagFilter||(state.spot&&state.spot!=='rest'))?.25:state.spot==='rest'?.45:1;
+  var st=$('#osmStatic');if(st){if(dimAll<1)st.setAttribute('opacity',dimAll);else st.removeAttribute('opacity')} /* [OSM] 対応づけのない実測建物も一括で減光 */
+}
+
+/* --- ラベル：画面座標の矩形で衝突判定（AABB）。重なるものは出さない --- */
+function tw(s,fs){var w=0;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);w+=c>=128?1:c===32?.3:(c>=65&&c<=90)?.7:.6}return w*fs}
+function LabelBoard(sRef){this.s=sRef;this.r=[]}
+LabelBoard.prototype.hit=function(a,skip){for(var i=0;i<this.r.length;i++){var b=this.r[i];if(skip&&b.id===skip)continue;if(a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1])return true}return false};
+LabelBoard.prototype.put=function(a,id){if(id)a.id=id;this.r.push(a)};
+LabelBoard.prototype.tryPut=function(a){if(this.hit(a))return false;this.r.push(a);return true};
+LabelBoard.prototype.at=function(wx,wy,x1,y1,x2,y2){var X=wx*this.s,Y=wy*this.s;return [X+x1,Y+y1,X+x2,Y+y2]};
+/* 建物の画面上の外接矩形（回転込み）の半幅・半高 */
+function bHalf(f,sRef){
+  var w=f.size[0],h=f.size[1],round=['circle','ring','hat','sun'].indexOf(f.shape)>=0;
+  if(round)return [w/2*sRef,w/2*sRef];
+  var a=(f.rot||0)*Math.PI/180,c=Math.abs(Math.cos(a)),s=Math.abs(Math.sin(a));
+  return [(w*c+h*s)/2*sRef,(w*s+h*c)/2*sRef];
+}
+function insideBox(f,sRef){
+  var w=f.size[0]*sRef,h=f.size[1]*sRef,round=['circle','ring','hat','sun','egg','jelly','cloud','domes'].indexOf(f.shape)>=0;
+  var rotated=Math.abs(f.rot)>18&&Math.abs(f.rot)<162;
+  if(round)return {w:Math.min(w,h)*.74,h:Math.min(w,h)*.62};
+  if(rotated){var m=Math.min(w,h);return {w:m*.86,h:m*.8}}
+  if(f.shape==='osm')return {w:w*.82-4,h:h*.72};
+  return {w:w-6,h:h-4};
+}
+/* 状態の小さなカラーピル（l2 のみ）：空／15分／終 */
+function stPill(s){ /* [OSM版] 小さな丸ドット＋待ち時間テキスト */
+  if(!s)return null;var t=s.st==='free'?'空き':s.st==='closed'?'終了':(s.wait!=null?s.wait+'分':(s.st==='ticket'?'整理券':'待ち'));
+  var w=10+tw(t,10)+2;
+  return {w:w,svg:'<circle cx="4" cy="0" r="4" class="spill" style="fill:var(--st-'+s.st+')"/><text class="t spt2" x="10" y="3.5" font-size="10">'+t+'</text>'};
+}
+/* 広域表示で名前を出す主要ランドマーク */
+var LANDMARKS=['jp','us','fr','it','hc',(facByName('GUNDAM NEXT FUTURE PAVILION')||{}).id,(facByName('EXPOホール「シャインハット」')||{}).id];
+
 function buildPins(){
   if(!view.init)return;
   var mode=state.mode,lvl=lastLvl<0?lvlOf():lastLvl,h='',now=Date.now(),recs=recIds();
-  /* world overlay: geofences, routes */
+  var tier=tierOf(),sRef=tier===0?Math.min(view.s,Math.max(view.sMin,.2)):TIER_MIN[tier];
+  var ctx={lvl:lvl,recs:recs,res:resIds(),plan:soonPlan()};
+  var B=new LabelBoard(sRef);
+  buildBuildings(ctx);
+  /* world overlay: geofences, routes（既存） */
   var ov='';
   state.anns.filter(function(a){return a.exp>now}).forEach(function(a){var col=a.urgent?'var(--st-closed)':'var(--accent)';ov+='<circle cx="'+a.x+'" cy="'+a.y+'" r="'+(a.r/M_PER_UNIT).toFixed(1)+'" style="fill:'+col+';fill-opacity:.12;stroke:'+col+'" stroke-width="2" class="dash" vector-effect="non-scaling-stroke"/>'});
   if(state.route){var rf=FM[state.route];ov+='<line x1="'+state.me.x+'" y1="'+state.me.y+'" x2="'+rf.pos[0]+'" y2="'+rf.pos[1]+'" class="dash" style="stroke:var(--accent)" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'}
-  if(mode==='ai')recs.forEach(function(id){var f=FM[id];ov+='<line x1="'+state.me.x+'" y1="'+state.me.y+'" x2="'+f.pos[0]+'" y2="'+f.pos[1]+'" class="dash" style="stroke:var(--accent);stroke-opacity:.55" stroke-width="2.5" vector-effect="non-scaling-stroke"/>'});
+  if(mode==='ai')recs.forEach(function(id){var f=FM[id];ov+='<line x1="'+state.me.x+'" y1="'+state.me.y+'" x2="'+f.pos[0]+'" y2="'+f.pos[1]+'" class="dash" style="stroke:var(--accent);stroke-opacity:.7" stroke-width="2.5" vector-effect="non-scaling-stroke"/>'});
   overG.innerHTML=ov;
-  /* pillar labels (01〜116) */
-  if(state.layer.pillars){ /* [追加] 柱番号レイヤー（オン／オフ切替。縮小時は10番ごと） */
-    for(var n=1;n<=PILLARS;n++){
-      if(lvl===0&&!(n%10===0||n===1))continue;
-      if(lvl===1&&!(n%5===0||n===1))continue;
-      var p=pillarPos(n);
-      h+='<text class="tm" data-wx="'+p[0].toFixed(1)+'" data-wy="'+p[1].toFixed(1)+'" font-size="'+(lvl>=2?10:11)+'" text-anchor="middle" dominant-baseline="central" font-weight="600">'+pad(n)+'</text>';
-    }
-  }
-  /* zone labels */
-  ZLABEL.forEach(function(z){
-    var col=ZCOL[z[0]],nm=ZN[z[0]];
-    h+='<g data-wx="'+z[1]+'" data-wy="'+z[2]+'" pointer-events="none">'+(lvl<=1?'<rect x="-8" y="-10" width="'+(nm.length*10+26)+'" height="20" rx="10" style="fill:'+col+'" fill-opacity=".95"/><circle r="10" style="fill:var(--surface);stroke:'+col+'" stroke-width="2"/><text class="bt" y="4" font-size="12" text-anchor="middle" style="fill:'+col+'">'+z[0]+'</text><text class="bt" x="16" y="4" font-size="10.5">'+nm+'</text>':'<circle r="10" style="fill:var(--surface);stroke:'+col+'" stroke-width="2"/><text class="bt" y="4" font-size="12" text-anchor="middle" style="fill:'+col+'">'+z[0]+'</text>')+'</g>';
-  });
-  /* infra */
-  INFRA.forEach(function(g){
-    if(!state.infra[g.k])return;
-    g.pts.forEach(function(q){h+='<g class="pin" data-infra="'+g.k+'" data-lbl="'+esc(q[2]||g.sub)+'" data-wx="'+q[0]+'" data-wy="'+q[1]+'"><circle r="'+(mode==='easy'?13:10)+'" style="fill:var(--surface);stroke:'+g.color+'" stroke-width="2.2"/><g transform="scale('+(mode==='easy'?.62:.5)+') translate(-12 -12)" fill="none" style="stroke:'+g.color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+INFRA_ICON[g.k]+'</g></g>'});
-  });
-  /* facilities */
+
+  /* 0) 建物の外形を障害物として登録（外側に置く文字が他の建物に重ならないように） */
+  var BB=new LabelBoard(sRef);
+  BLD.forEach(function(f){var hb=bHalf(f,sRef);BB.put(B.at(f.pos[0],f.pos[1],-hb[0],-hb[1],hb[0],hb[1]),f.id)});
+
+  /* 1) 必ず表示：現在地・検索ピン・東西ゲート・アナウンス */
+  h+='<g data-wx="'+state.me.x+'" data-wy="'+state.me.y+'" pointer-events="none"><circle r="16" class="pulse" style="fill:var(--accent);fill-opacity:.4"/><circle r="8" style="fill:var(--accent);stroke:#fff" stroke-width="3"/><text class="t" y="24" font-size="11" font-weight="900" text-anchor="middle">現在地</text></g>';
+  B.put(B.at(state.me.x,state.me.y,-18,-12,18,30));
+  if(state.found){var fd=state.found;h+='<g data-wx="'+fd.x+'" data-wy="'+fd.y+'" pointer-events="none"><circle r="16" class="pulse" style="fill:var(--brand);fill-opacity:.45"/><path d="M0 0C-14 -16 -13 -34 0 -34C13 -34 14 -16 0 0z" transform="translate(0 -2)" style="fill:var(--brand);stroke:var(--surface)" stroke-width="2"/><circle cy="-22" r="4.5" style="fill:#fff"/><text class="t" y="-42" font-size="13" font-weight="900" text-anchor="middle">'+esc(fd.label)+'</text></g>';var fw=tw(fd.label,13)/2+4;B.put(B.at(fd.x,fd.y,-Math.max(16,fw),-56,Math.max(16,fw),4))}
   F.forEach(function(f){
-    var s=state.fac[f.id],wx=f.pos[0].toFixed(1),wy=f.pos[1].toFixed(1),fl=s&&(now-s.changed<3600),k=f.kind;
-    if(k==='emover'){if(mode==='ai'||lvl<1)return;h+=pinG(f.id,wx,wy,'<rect x="-11" y="-9" width="22" height="18" rx="6" style="fill:var(--ink)"/><text class="bt" y="4" font-size="11" text-anchor="middle" style="fill:var(--bg)">'+f.g+'</text>'+(lvl>=2?lab(f.name.replace('e Mover ',''),15,4,10,500):''));return}
-    if(k==='gate'){h+=pinG(f.id,wx,wy,pill(f,mode==='easy'?13:11));return}
-    if(k==='station'){if(lvl<1&&f.id!=='stn')return;h+=pinG(f.id,wx,wy,'<rect x="-10" y="-10" width="20" height="20" rx="5" style="fill:var(--ink-2)"/><text class="bt" y="4" font-size="11" text-anchor="middle" style="fill:var(--bg)">'+f.g+'</text>'+(lvl>=1?lab(f.name,14,4,10,500):''));return}
-    if(mode==='easy'){
-      if(k==='pav'||k==='com'){
-        if(!f.major&&!hasTag(f))return; // [追加] 運用区分で絞り込み中は該当施設をすべて表示
-        var showName=lvl>=1||f.top;
-        h+=pinG(f.id,wx,wy,'<g transform="scale('+(lvl===0?.85:1)+')">'+isoBlock(f)+(showName?'<text class="t" y="34" font-size="13" font-weight="900" text-anchor="middle">'+esc(f.short)+'</text>':'')+badge(s.st,10,22,-22,12,fl)+(state.layer.tags&&(lvl>=1||hasTag(f))?svgTag(f,0,showName?50:30,'middle'):'')+'</g>',dimOf(f)?'opacity=".22"':''); // [追加] 運用バッジ
-      }else if(k==='wc'){if(lvl<2||state.infra.wc)return;h+=pinG(f.id,wx,wy,'<circle r="14" style="fill:#2d6fe0;stroke:var(--surface)" stroke-width="2.5"/>'+pictoWC())}
-      else if(k==='mkt'){if(lvl<1)return;h+=pinG(f.id,wx,wy,'<circle r="15" style="fill:#e07b1a;stroke:var(--surface)" stroke-width="2.5"/>'+pictoRest()+(lvl>=2?'<text class="t" y="29" font-size="12" font-weight="700" text-anchor="middle">'+esc(f.short)+'</text>':''))}
-      else if(k==='plaza'&&lvl>=2){h+=pinG(f.id,wx,wy,'<text class="t" font-size="12" font-weight="500" text-anchor="middle" style="fill:var(--ink-2)">'+esc(f.name)+'</text>')}
-    }else if(mode==='gachi'){
-      if(k==='pav'||k==='com'){
-        var c=k==='com'?'var(--com-l)':'var(--pin-l)',t2=f.rule+'・'+(s.wait==null?'待ち—':(s.wait===0?'待ちなし':'待ち'+s.wait+'分'));
-        var inner='<rect x="-9" y="-9" width="18" height="18" rx="5" style="fill:'+c+';stroke:var(--surface)" stroke-width="1.5"/><text class="bt" y="4" font-size="11" text-anchor="middle">'+esc(f.g.length>1?f.g.charAt(0):f.g)+'</text>'+badge(s.st,6.5,9,-9,8,fl);
-        if(lvl>=2||(lvl>=1&&f.major))inner+='<text class="t" x="14" y="-1" font-size="11" font-weight="900">'+esc(f.short)+'</text>';
-        if(state.layer.tags&&(lvl>=2||hasTag(f)))inner+=svgTag(f,14,-16,'start'); // [追加] 運用バッジ
-        if(lvl>=3)inner+='<text class="tm" x="14" y="11" font-size="10" font-weight="500">'+esc(t2)+'</text>';
-        if(lvl>=3&&f.countries)inner+='<text class="t" x="14" y="22" font-size="9.5" font-weight="500" style="fill:var(--ink-2)">'+esc(f.countries.slice(0,3).join('・')+(f.countries.length>3?'…（'+f.countries.length+'か国）':''))+'</text>';
-        h+=pinG(f.id,wx,wy,inner,dimOf(f)?'opacity=".22"':'');
-      }else if(k==='venue'){if(lvl<2)return;h+=pinG(f.id,wx,wy,'<rect x="-7" y="-7" width="14" height="14" rx="3" style="fill:var(--ink-2);fill-opacity:.85;stroke:var(--surface)" stroke-width="1.5"/>'+(lvl>=3?'<text class="t" x="12" y="3.5" font-size="10" font-weight="500" style="fill:var(--ink-2)">'+esc(f.short)+'</text>':''))}
-      else if(k==='plaza'){if(lvl<2)return;h+=pinG(f.id,wx,wy,'<text class="t" font-size="10.5" font-weight="500" text-anchor="middle" style="fill:var(--ink-2)">'+esc(f.name)+'</text>')}
-      else if(k==='mkt'){if(lvl<1)return;h+=pinG(f.id,wx,wy,'<circle r="7" style="fill:#e07b1a;stroke:var(--surface)" stroke-width="1.5"/>'+(lvl>=2?'<text class="t" x="11" y="3.5" font-size="10" font-weight="500" style="fill:var(--ink-2)">'+esc(f.short)+'</text>':''))}
-      else if(k==='wc'){if(lvl<2||state.infra.wc)return;h+=pinG(f.id,wx,wy,'<circle r="6" style="fill:#2d6fe0;stroke:var(--surface)" stroke-width="1.5"/>')}
-    }else{ /* ai */
-      var ri=recs.indexOf(f.id);
-      if(ri>=0){
-        h+=pinG(f.id,wx,wy,'<circle r="20" class="pulse" style="fill:var(--accent);fill-opacity:.35"/><circle r="17" style="fill:var(--accent);stroke:var(--surface)" stroke-width="3"/><text class="bt" y="6" font-size="17" text-anchor="middle" style="fill:var(--accent-ink);font-family:var(--f-mono)">'+(ri+1)+'</text><text class="t" y="36" font-size="13" font-weight="900" text-anchor="middle">'+esc(f.short)+'</text>'+badge(s.st,8,18,-16,10,fl));
-      }else if(k==='pav'||k==='com'){h+=pinG(f.id,wx,wy,'<circle r="4.5" style="fill:var(--ink-2);fill-opacity:.45"/>')}
-    }
+    if(f.kind==='gate'){var fs=12,w=Math.max(54,f.name.length*(fs+1)+22);h+=pinG(f.id,f.pos[0],f.pos[1],pill(f,fs));B.put(B.at(f.pos[0],f.pos[1],-w/2,-12,w/2,12))}
   });
-  /* announcements */
   state.anns.filter(function(a){return a.exp>now}).forEach(function(a){
     var col=a.urgent?'var(--st-closed)':'var(--accent)',txt=a.text.length>13?a.text.slice(0,12)+'…':a.text,w=Math.max(70,txt.length*11+34);
     h+='<g class="pin" data-ann="'+a.id+'" data-wx="'+a.x+'" data-wy="'+a.y+'"><g transform="translate(0 -30)"><rect x="'+(-w/2)+'" y="-13" width="'+w+'" height="26" rx="13" style="fill:'+col+'"/><text class="bt" x="0" y="4.5" font-size="11.5" text-anchor="middle" style="fill:#fff">'+esc(txt)+'</text></g><path d="M-5 -17L0 -9L5 -17z" style="fill:'+col+'"/><circle r="4" style="fill:'+col+'"/></g>';
+    B.put(B.at(a.x,a.y,-w/2,-43,w/2,4));
   });
-  /* found marker */
-  if(state.found){var fd=state.found;h+='<g data-wx="'+fd.x+'" data-wy="'+fd.y+'" pointer-events="none"><circle r="16" class="pulse" style="fill:var(--brand);fill-opacity:.45"/><path d="M0 0C-14 -16 -13 -34 0 -34C13 -34 14 -16 0 0z" transform="translate(0 -2)" style="fill:var(--brand);stroke:var(--surface)" stroke-width="2"/><circle cy="-22" r="4.5" style="fill:#fff"/><text class="t" y="-42" font-size="13" font-weight="900" text-anchor="middle">'+esc(fd.label)+'</text></g>'}
-  /* me */
-  h+='<g data-wx="'+state.me.x+'" data-wy="'+state.me.y+'" pointer-events="none"><circle r="16" class="pulse" style="fill:var(--accent);fill-opacity:.4"/><circle r="8" style="fill:var(--accent);stroke:#fff" stroke-width="3"/><text class="t" y="24" font-size="11" font-weight="900" text-anchor="middle">現在地</text></g>';
+  /* ゾーン名（8ゾーン）：広域ではピル、中距離以降は記号だけ */
+  ZLABEL.forEach(function(z){
+    if(mode==='ai')return;
+    var col=ZCOL[z[0]],nm=ZN[z[0]],full=lvl===0,w=full?nm.length*10+26:20;
+    if(lvl>=3)return;
+    if(!B.tryPut(B.at(z[1],z[2],-10,-10,w-8,10)))return;
+    h+='<g data-wx="'+z[1]+'" data-wy="'+z[2]+'" pointer-events="none">'+(full?'<rect x="-8" y="-10" width="'+(nm.length*10+26)+'" height="20" rx="10" style="fill:'+col+'" fill-opacity=".95"/><circle r="10" style="fill:var(--surface);stroke:'+col+'" stroke-width="2"/><text class="bt" y="4" font-size="12" text-anchor="middle" style="fill:'+col+'">'+z[0]+'</text><text class="bt" x="16" y="4" font-size="10.5">'+nm+'</text>':'<circle r="9" style="fill:var(--surface);stroke:'+col+'" stroke-width="2"/><text class="bt" y="4" font-size="11" text-anchor="middle" style="fill:'+col+'">'+z[0]+'</text>')+'</g>';
+  });
+  /* 大屋根リングの名前（広域から表示）と静けさの森（中距離以降） */
+  [['大屋根リング',C.x,C.y+RING_R+4,13,0],['静けさの森',818,575,13,1]].forEach(function(a){if(lvl<a[4]||mode==='ai')return;var w=tw(a[0],a[3])/2+2;if(B.tryPut(B.at(a[1],a[2],-w,-9,w,9)))h+='<text class="t" data-wx="'+a[1]+'" data-wy="'+a[2]+'" font-size="'+a[3]+'" font-weight="700" text-anchor="middle" dominant-baseline="central" letter-spacing="2" pointer-events="none" style="fill:var(--ink-2)">'+a[0]+'</text>'});
+
+  /* 2) AIおまかせ：おすすめ3施設を強調 */
+  if(mode==='ai'){
+    recs.forEach(function(id,ri){var f=FM[id],s=state.fac[id];
+      h+=pinG(f.id,f.pos[0],f.pos[1],'<circle r="20" class="pulse" style="fill:var(--accent);fill-opacity:.35"/><circle r="17" style="fill:var(--accent);stroke:var(--surface)" stroke-width="3"/><text class="bt" y="6" font-size="17" text-anchor="middle" style="fill:var(--accent-ink);font-family:var(--f-mono)">'+(ri+1)+'</text><text class="t" y="36" font-size="13" font-weight="900" text-anchor="middle">'+esc(f.short)+'</text>');
+      var w=Math.max(40,tw(f.short,13)/2+4);B.put(B.at(f.pos[0],f.pos[1],-22,-22,22,22));B.put(B.at(f.pos[0],f.pos[1],-w,26,w,42));
+    });
+  }
+  /* 3) ユーザーが表示したピクト（インフラ） */
+  INFRA.forEach(function(g){
+    if(!infraOn(g.k))return;
+    g.pts.forEach(function(q){h+='<g class="pin" data-infra="'+g.k+'" data-lbl="'+esc(q[2]||g.sub)+'" data-wx="'+q[0]+'" data-wy="'+q[1]+'"><circle r="10" style="fill:var(--surface);stroke:'+g.color+'" stroke-width="2.2"/><g transform="scale(.5) translate(-12 -12)" fill="none" style="stroke:'+g.color+'" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+INFRA_ICON[g.k]+'</g></g>';B.put(B.at(q[0],q[1],-10,-10,10,10))});
+  });
+  /* 「予約済み・予定」：直近1時間のショー（文字のみ） */
+  if(state.spot==='plan')ctx.plan.shows.forEach(function(i){
+    var t=fmtSlot(i.t)+' '+i.label,p=i.s.pos,w=tw(t,11)/2+2;
+    if(B.tryPut(B.at(p[0],p[1],-w,-8,w,8)))h+='<text class="t" data-wx="'+p[0]+'" data-wy="'+p[1]+'" font-size="11" font-weight="900" text-anchor="middle" dominant-baseline="central" pointer-events="none" style="fill:var(--accent)">'+esc(t)+'</text>';
+  });
+
+  /* 4) 館名：ズーム段階ごとに厳格に間引き。重なるものは表示しない */
+  var cand=BLD.filter(function(f){
+    if(mode==='ai')return false;
+    var p=prioOf(f,ctx),lm=LANDMARKS.indexOf(f.id)>=0;
+    if(lvl===0)return lm;                                   /* 広域：主要ランドマークのみ */
+    if(bOpacity(f,ctx)<.3)return false;                     /* 薄くした館は名前も出さない */
+    if(lvl===1)return lm||f.major||f.kind==='com'||p<=2;    /* 中距離：主要館・コモンズ館（＋予約済み・スポットライト対象） */
+    if(mode==='l1')return lm||f.major||f.kind==='com'||p<=2||!!BLD_SHAPES[f.name];
+    if(f.kind==='venue')return lvl>=3;
+    return true;                                            /* 拡大：細かな館名も */
+  }).sort(function(a,b){return (prioOf(a,ctx)-prioOf(b,ctx))||(b.br-a.br)});
+  cand.forEach(function(f){
+    var p=prioOf(f,ctx),s=state.fac[f.id],r=ctx.res[f.id],name=f.short||f.name,fs=lvl>=3?12:11,nw=tw(name,fs),sub=r?'予約 '+hm(r.t):'';
+    var ib=insideBox(f,sRef),placed=false,dim=bOpacity(f,ctx)<1&&p>2?' opacity=".5"':'';
+    var two=sub&&ib.h>=fs*2+6&&tw(sub,fs-1)<=ib.w;
+    var txt=function(y){return '<text class="t bin'+(r?' res':'')+'" y="'+y+'" font-size="'+fs+'" text-anchor="middle">'+esc(name)+'</text>'+(sub?'<text class="t sub" y="'+(y+fs+1)+'" font-size="'+(fs-1)+'" text-anchor="middle">'+esc(sub)+'</text>':'')};
+    /* (a) 建物の中に収まるなら枠内 */
+    if(nw<=ib.w&&fs+3<=ib.h&&(!sub||two)){
+      var hh=sub?fs*2+3:fs+2,rect=B.at(f.pos[0],f.pos[1],-nw/2-2,-hh/2-1,nw/2+2,hh/2+1);
+      if(!B.hit(rect)){B.put(rect);h+=pinG(f.id,f.pos[0],f.pos[1],txt(sub?-1:fs*.36),dim);placed=true}
+    }
+    /* (b) 入らなければ建物のすぐ下に白フチ文字。他の文字・建物に重なるなら出さない */
+    if(!placed){
+      var hb=bHalf(f,sRef),lw=Math.max(nw,sub?tw(sub,fs-1):0),lh=sub?fs*2+3:fs+3;
+      var rect2=B.at(f.pos[0],f.pos[1],-lw/2-1,hb[1]+1,lw/2+1,hb[1]+1+lh);
+      if(!B.hit(rect2)&&!(lvl>=2&&BB.hit(rect2,f.id))){ /* 文字どうしは常に、建物との重なりは拡大時のみ判定 */B.put(rect2);h+=pinG(f.id,f.pos[0],f.pos[1],txt(hb[1]+fs*.9),dim);placed=true}
+    }
+    /* (c) 入場・混雑攻略：建物の右上角に小さな状態ピル（控えめに・重なれば省略） */
+    if(mode==='l2'&&lvl>=2&&s&&!(bOpacity(f,ctx)<1)){
+      var P=stPill(s),hb2=bHalf(f,sRef),px=hb2[0]*.7-3,py=-hb2[1]*.7-3;
+      var rp=B.at(f.pos[0],f.pos[1],px,py-7,px+P.w,py+7);
+      if(B.tryPut(rp))h+='<g class="pin" data-id="'+f.id+'" data-wx="'+f.pos[0]+'" data-wy="'+f.pos[1]+'"><g transform="translate('+px.toFixed(1)+' '+py.toFixed(1)+')">'+P.svg+'</g></g>';
+    }
+  });
+
+  /* 5) 駅・e Mover・トイレ・広場（拡大時のみ・空いていれば） */
+  F.forEach(function(f){
+    var k=f.kind,x=f.pos[0],y=f.pos[1];
+    if(mode==='ai'||lvl<1)return;
+    if(k==='station'){if(lvl<2&&f.id!=='stn')return;var box=B.at(x,y,-9,-9,9,9);if(!B.tryPut(box))return;var lw=tw(f.name,10)+4;h+=pinG(f.id,x,y,'<rect x="-9" y="-9" width="18" height="18" rx="5" style="fill:var(--ink-2)"/><text class="bt" y="4" font-size="10.5" text-anchor="middle" style="fill:var(--bg)">'+f.g+'</text>'+(lvl>=2&&B.tryPut(B.at(x,y,11,-7,13+lw,7))?lab(f.name,13,4,10,500):''));return}
+    if(lvl<3)return;
+    if(k==='emover'&&mode==='l2'){if(B.tryPut(B.at(x,y,-10,-8,10,8)))h+=pinG(f.id,x,y,'<rect x="-10" y="-8" width="20" height="16" rx="5" style="fill:var(--ink)"/><text class="bt" y="4" font-size="10" text-anchor="middle" style="fill:var(--bg)">'+f.g+'</text>');return}
+    if(k==='wc'&&mode==='l2'&&!infraOn('wc')){if(B.tryPut(B.at(x,y,-5,-5,5,5)))h+=pinG(f.id,x,y,'<circle r="5" style="fill:#2d6fe0;stroke:var(--surface)" stroke-width="1.5"/>');return}
+    if(k==='plaza'&&f.name!=='静けさの森'){var pw=tw(f.name,10.5)/2;var pr=B.at(x,y,-pw,-7,pw,7);if(!B.hit(pr)&&!BB.hit(pr)){B.put(pr);h+=pinG(f.id,x,y,'<text class="t" font-size="10.5" font-weight="500" text-anchor="middle" dominant-baseline="central" style="fill:var(--ink-2)">'+esc(f.name)+'</text>')}}
+  });
+
+  /* 6) 柱番号：中距離は10番刻み、拡大で5番→全番号（広域・AIでは非表示） */
+  if(state.layer.pillars&&mode!=='ai'&&lvl>=1){
+    for(var n=1;n<=PILLARS;n++){
+      if(mode==='l1'||lvl===1){if(!(n%10===0||n===1))continue}
+      else if(lvl===2&&!(n%5===0||n===1))continue;
+      var pp=pillarPos(n);
+      if(!B.tryPut(B.at(pp[0],pp[1],-8,-6,8,6)))continue;
+      h+='<text class="tm" data-wx="'+pp[0].toFixed(1)+'" data-wy="'+pp[1].toFixed(1)+'" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="600">'+pad(n)+'</text>';
+    }
+  }
+
   layerG.innerHTML=h;
   pinNodes=$$('[data-wx]',layerG).map(function(el){return {el:el,x:+el.getAttribute('data-wx'),y:+el.getAttribute('data-wy')}});
   for(var i=0;i<pinNodes.length;i++){var nn=pinNodes[i];nn.el.setAttribute('transform','translate('+(nn.x*view.s+view.tx).toFixed(1)+' '+(nn.y*view.s+view.ty).toFixed(1)+')')}
 }
+
+/* --- 凡例 [整理]：状態ドットの1行だけ（入場・混雑攻略のときのみ） --- */
+var legendOpen=false;
+function renderLegend(){
+  var el=$('#legend');if(!el)return;
+  if(state.mode!=='l2'){el.hidden=true;return}
+  el.hidden=false;
+  var row=[['free','空き'],['ticket','整理券'],['wait','待ち'],['closed','終了']].map(function(a){return '<span><i class="lg-dot" style="background:var(--st-'+a[0]+')"></i>'+a[1]+'</span>'}).join('');
+  if(state.layer.tags)row+='<span class="lg-more">'+['res','first','both','principle','sameday'].map(function(k){return '<i class="lg-sw" style="background:'+BCAT[k].c+'"></i>'+BCAT[k].l}).join(' ')+'</span>';
+  el.innerHTML=row;
+}
+
 function setMode(m){
   state.mode=m;
   $$('#modeSeg button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.mode===m)});
   $('#mapwrap').classList.toggle('ai',m==='ai');
+  renderLegend(); // [改修]
+  if(m==='ai'&&state.spot){state.spot=null;renderChips();$('#mapmsg').hidden=true} // AIおまかせではスポットライトを解除
   if(m==='ai'){state.recs=recommend();renderAI()}else{$('#aipanel').hidden=true;state.recs=null}
   $('#mapmsg').classList.toggle('up',m==='ai');
   buildPins();
@@ -1288,7 +1744,7 @@ function showMsg(txt,clear,extra){
   m.innerHTML='<span class="grow">'+esc(txt)+'</span>'+(extra||'')+(clear?'<button type="button" id="msgClr">解除</button>':'');
   var me=$('#msgMe');if(me)me.onclick=function(){if(!state.found)return;state.me={x:state.found.x,y:state.found.y};buildPins();renderHome();if(state.mode==='ai')renderAI();toast('現在地を '+state.found.label+' に補正しました')}; // [追加] 柱番号で現在地を補正
   m.classList.toggle('up',state.mode==='ai');
-  var c=$('#msgClr');if(c)c.onclick=function(){state.found=null;state.tagFilter=null;m.hidden=true;renderChips();buildPins()};
+  var c=$('#msgClr');if(c)c.onclick=function(){state.found=null;state.tagFilter=null;state.spot=null;m.hidden=true;renderChips();buildPins()};
 }
 $('#msearch').addEventListener('submit',function(e){
   e.preventDefault();
@@ -1334,17 +1790,27 @@ $('#msearch').addEventListener('submit',function(e){
 /* ----- infra chips & legend ----- */
 /* [追加] レイヤー切替チップ：先頭の「レイヤー」で詳細パネル、以降はワンタップでオン／オフ */
 function infraIcon(g){return '<svg viewBox="0 0 24 24" style="color:'+g.color+';stroke:'+g.color+'">'+(INFRA_ICON[g.k]||'')+'</svg>'}
-function renderChips(){
-  $('#infra').innerHTML='<button class="chip" id="layerBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>レイヤー</button>'+
+function renderChips(){ /* [改修] 先頭に目的別スポットライト（排他トグル）、続いて個別レイヤー */
+  $('#infra').innerHTML=SPOTS.map(function(sp){return '<button class="chip spot" data-spot="'+sp.k+'" aria-pressed="'+(state.spot===sp.k)+'"><svg viewBox="0 0 24 24">'+sp.icon+'</svg>'+sp.label+'</button>'}).join('')+
+    '<span class="chip-sep" aria-hidden="true"></span>'+
+    '<button class="chip" id="layerBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>レイヤー</button>'+
     (state.tagFilter?'<button class="chip" data-tf="" aria-pressed="true" aria-label="絞り込みを解除">'+esc(TAGDEF[state.tagFilter].label)+' ✕</button>':'')+
-    '<button class="chip" data-l="tags" aria-pressed="'+state.layer.tags+'">運用バッジ</button><button class="chip" data-l="pillars" aria-pressed="'+state.layer.pillars+'">柱番号</button>'+
+    '<button class="chip" data-l="pillars" aria-pressed="'+state.layer.pillars+'">柱番号 01〜116</button><button class="chip" data-l="tags" aria-pressed="'+state.layer.tags+'">入場区分の色</button>'+
     INFRA.map(function(g){return '<button class="chip" data-k="'+g.k+'" aria-pressed="'+!!state.infra[g.k]+'">'+infraIcon(g)+g.label+'</button>'}).join('');
+  renderLegend();
+}
+function spotMsg(){ /* [改修] スポットライトの対象件数を表示 */
+  if(!state.spot){$('#mapmsg').hidden=true;return}
+  var ctx={res:resIds(),plan:soonPlan()},sp=SPOTS.find(function(x){return x.k===state.spot}),t;
+  if(state.spot==='rest')t='トイレ・給水機・水飲み場・救護所／休憩所を表示中';
+  else{var n=BLD.filter(function(f){return spotMatch(f,ctx)}).length;t=sp.label+'：'+n+'件を強調表示中'+(state.spot==='plan'&&ctx.plan.shows.length?'（ショー '+ctx.plan.shows.length+'件）':'')+(state.spot==='food'?'（斜線＝飲食あり）':'')}
+  showMsg(t,true);
 }
 function layerSheet(){
   function cnt(k){return F.filter(function(f){return f.tags&&f.tags.indexOf(k)>=0}).length}
   function body(){
     return '<h3 style="font-size:18px;font-weight:900">マップのレイヤー</h3><div class="lyr">'+
-      '<label class="switch"><input type="checkbox" data-l="tags" '+(state.layer.tags?'checked':'')+'>運用バッジ（予約のみ・先着のみ など）</label>'+
+      '<label class="switch"><input type="checkbox" data-l="tags" '+(state.layer.tags?'checked':'')+'>入場・予約区分で建物を色分け（予約のみ・先着のみ など）</label>'+
       '<label class="switch"><input type="checkbox" data-l="pillars" '+(state.layer.pillars?'checked':'')+'>大屋根リングの柱番号（01〜116）</label></div>'+
       '<div class="lyrh">運用区分で絞り込み</div><div class="chips wrap">'+['all'].concat(Object.keys(TAGDEF)).map(function(k){var on=k==='all'?!state.tagFilter:state.tagFilter===k;return '<button class="chip" data-tf="'+k+'" aria-pressed="'+on+'">'+(k==='all'?'すべて':esc(TAGDEF[k].label)+'（'+cnt(k)+'）')+'</button>'}).join('')+'</div>'+
       '<div class="lyrh">現地インフラ</div><div class="lyr">'+INFRA.map(function(g){return '<label class="switch"><input type="checkbox" data-k="'+g.k+'" '+(state.infra[g.k]?'checked':'')+'>'+infraIcon(g)+'<span class="grow">'+g.label+'</span><span class="small muted">'+g.pts.length+'か所</span></label>'}).join('')+'</div>'+
@@ -1359,9 +1825,12 @@ function layerSheet(){
 }
 (function(){
   renderChips(); // [追加] レイヤー切替（運用バッジ／柱番号／インフラ）
-  $('#legend').innerHTML=['free','ticket','closed','wait'].map(function(k){return '<span>'+dotHTML(k)+ST[k].label.replace('本日受付終了／予約のみ','受付終了・予約のみ')+'</span>'}).join('');
+  $('#legend').addEventListener('click',function(e){if(e.target.closest('.lg-t')){legendOpen=!legendOpen;renderLegend()}});
+  renderLegend();
+  void ['free','ticket','closed','wait'].map(function(k){return '<span>'+dotHTML(k)+ST[k].label.replace('本日受付終了／予約のみ','受付終了・予約のみ')+'</span>'}).join('');
   $('#infra').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;
     if(b.id==='layerBtn'){layerSheet();return}
+    if(b.dataset.spot){var k=b.dataset.spot;state.spot=state.spot===k?null:k;if(state.spot&&state.mode==='ai')setMode('l2');renderChips();buildPins();spotMsg();return}
     if(b.dataset.l){state.layer[b.dataset.l]=!state.layer[b.dataset.l]}
     else if(b.dataset.tf!=null){state.tagFilter=null}
     else if(b.dataset.k){state.infra[b.dataset.k]=!state.infra[b.dataset.k]}
@@ -1523,6 +1992,7 @@ setInterval(function(){
 },26000);
 
 /* ---------- boot ---------- */
+osmInit(); /* [OSM] キャッシュがあれば即時、なければ非同期で実測地図を取得 */
 setupTicket();placeStaff();renderHome();renderRes();renderWallet();renderStaffStatus();renderStaffLog();renderAnnList();
 setInterval(function(){renderHours();if(state.tab==='home')renderHome();if(state.tab==='res')renderRes(true);if(state.mode==='ai'&&state.tab==='map')renderAI()},30000); // [修正] 9:00／22:00の境目で表示を自動切替
 })();
