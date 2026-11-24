@@ -66,8 +66,8 @@ h1,h2,h3,p{margin:0}
 .screen.on{display:block}
 #s-map.on{display:flex;flex-direction:column;overflow:hidden}
 .pad{padding-block:16px 28px;display:grid;gap:20px;align-content:start}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:0}
-.tabs button{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 7px;border:0;background:none;color:var(--ink-2);font-size:11px;font-weight:700;min-height:56px}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:0}
+.tabs button{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;border:0;background:none;color:var(--ink-2);font-size:10.5px;white-space:nowrap;letter-spacing:-.02em;font-weight:700;min-height:56px}
 .tabs button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tabs button[aria-current="page"]{color:var(--accent)}
 .tabs button[aria-current="page"]::before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
@@ -225,6 +225,69 @@ h1,h2,h3,p{margin:0}
 .tm.pl-ten{fill:var(--ink);stroke-width:2px}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wp-label{fill:#cfe6ff}}
 :root[data-theme="dark"] .wp-label{fill:#cfe6ff}
+
+/* [ホンヤク] 翻訳画面 */
+.tr{gap:14px}
+.tr-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tr-head b{display:block;font-size:20px;font-weight:900;letter-spacing:.01em}.tr-head small{color:var(--ink-2);font-size:11.5px}
+.tr-head .btn svg{margin-right:2px}
+.tr-lang{display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:6px}
+.tr-from,.tr-to select{display:flex;align-items:center;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:800;font-size:13px;color:var(--ink);width:100%}
+.tr-to select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-2) 50%),linear-gradient(135deg,var(--ink-2) 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:26px}
+.tr-swap{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);display:grid;place-items:center;color:var(--accent)}
+.tr-swap svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tr-talk{display:grid;gap:10px}
+.tr-tl{display:grid;gap:10px;max-height:44vh;overflow:auto;padding:2px}
+.tb{max-width:88%;border-radius:16px;padding:10px 12px;border:1px solid var(--line);background:var(--surface)}
+.tb.me{justify-self:end;background:var(--accent-soft);border-color:transparent;border-bottom-right-radius:6px}
+.tb.them{justify-self:start;border-bottom-left-radius:6px}
+.tb.fresh{animation:tbIn .3s ease-out}
+@keyframes tbIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tb-who{font-size:10.5px;font-weight:800;color:var(--ink-2);margin-bottom:2px}
+.tb-src{font-size:12.5px;color:var(--ink-2)}
+.tb-out{display:flex;align-items:flex-start;gap:6px;margin-top:4px;font-size:16px;font-weight:800;line-height:1.45}
+.tb-out>span:nth-child(2){flex:1}
+.lc{display:inline-block;flex:none;font-family:var(--f-mono);font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:5px;background:var(--surface-2);color:var(--ink-2);margin-right:6px;vertical-align:1px}
+.tb-out .lc{margin-top:4px;margin-right:0;background:var(--accent);color:var(--accent-ink)}
+.tb-sp{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--accent)}
+.tb-sp svg,.gl-sp{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-gl{margin-top:6px;font-size:11px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:5px}
+#trPhr .chip{box-shadow:none}#trPhr .chip.fac{border-color:var(--accent);color:var(--accent)}
+.tr-input{display:flex;gap:8px}
+.tr-input input{flex:1;min-width:0;min-height:46px;border:1px solid var(--line);border-radius:12px;padding:0 12px;background:var(--surface);color:var(--ink);font:inherit}
+.tr-mic{display:flex;align-items:center;justify-content:center;gap:8px;min-height:58px;border:0;border-radius:29px;background:var(--accent);color:var(--accent-ink);font-weight:900;font-size:16px;box-shadow:var(--shadow)}
+.tr-mic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tr-mic.on{background:var(--brand);color:#fff}
+.wave{display:inline-flex;align-items:center;gap:3px;height:22px}
+.wave i{width:4px;height:8px;border-radius:2px;background:currentColor;animation:wv .9s ease-in-out infinite}
+.wave i:nth-child(2){animation-delay:.12s}.wave i:nth-child(3){animation-delay:.24s}.wave i:nth-child(4){animation-delay:.36s}.wave i:nth-child(5){animation-delay:.48s}
+@keyframes wv{0%,100%{height:6px}50%{height:22px}}
+.trov{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;padding:24px;cursor:pointer}
+.trov-card{transform:rotate(180deg);text-align:center;max-width:640px}
+.trov-card .lc{background:var(--accent);color:var(--accent-ink);font-size:12px}
+.trov-t{font-size:clamp(28px,8vw,52px);font-weight:900;line-height:1.35;margin-top:12px}
+.trov-s{margin-top:14px;font-size:15px;color:var(--ink-2)}
+.trcam{position:relative;aspect-ratio:4/3;width:100%;border-radius:16px;overflow:hidden;background:#0b1224;color:#cfd8ee}
+.trcam>svg{position:absolute;inset:0;width:100%;height:100%}
+.trcam-idle{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;text-align:center;font-size:13px;padding:20px}
+.trcam-idle svg{width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.trcam-idle small{opacity:.7}
+.trcam-scan{position:absolute;left:0;right:0;height:3px;background:var(--brand);box-shadow:0 0 12px var(--brand);top:0;animation:trscan .5s ease-in forwards}
+@keyframes trscan{from{top:0;opacity:1}to{top:100%;opacity:0}}
+.trcam-ar span{position:absolute;transform:translate(-50%,-50%);padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.95);color:#13203d;font-size:12.5px;font-weight:800;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35);border:1.5px solid #2150e0;opacity:0;animation:arIn .25s ease-out forwards}
+@keyframes arIn{from{opacity:0;transform:translate(-50%,-30%)}to{opacity:1;transform:translate(-50%,-50%)}}
+.trcam-ar.off{display:none}
+.trcam-cap{position:absolute;left:10px;bottom:8px;font-size:11px;font-weight:700;background:rgba(0,0,0,.55);color:#fff;padding:2px 8px;border-radius:99px}
+#trCam [data-cam][aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.gl-list{display:grid;gap:8px}
+.gl{display:grid;grid-template-columns:1fr auto;grid-template-areas:"ja sp" "x sp" "note sp";text-align:left;gap:1px 10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink)}
+.gl-ja{grid-area:ja;display:flex;align-items:baseline;gap:8px}.gl-ja b{font-size:15px}.gl-ja small{color:var(--ink-2);font-size:11px}
+.gl-x{grid-area:x;font-size:15px;font-weight:800;color:var(--accent)}
+.gl-note{grid-area:note;font-size:11px;color:var(--ink-2)}
+.gl-sp{grid-area:sp;width:22px;height:22px;color:var(--accent)}
+.tr-link{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:8px;min-height:40px;border:0;background:none;color:var(--accent);font-weight:800;font-size:13px}
+.tr-link svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .hits circle{fill:rgba(0,0,0,0);pointer-events:all}
 .bd-c{stroke:#fff;stroke-width:1.6px}
 .bd-g{fill:#fff;font-weight:900;font-family:var(--f-body)}.bd-g.dk{fill:#1a1200}
@@ -339,7 +402,7 @@ h1,h2,h3,p{margin:0}
   .phone{height:min(900px,100%);border-radius:34px;border:1px solid var(--line);box-shadow:var(--shadow)}
   .staffpanel{display:block;width:450px;height:min(900px,100%);flex:none;background:var(--bg);border:1px solid var(--line);border-radius:24px;overflow:auto;box-shadow:var(--shadow)}
   .staffpanel.screen{display:block}
-  .tabs{grid-template-columns:repeat(4,1fr)}
+  .tabs{grid-template-columns:repeat(5,1fr)} /* [ホンヤク] PCは現場を除く5タブ */
   .t-staff{display:none!important}
 }
 @media (max-width:420px){.net span{display:none}.brand small{display:none}}
@@ -458,6 +521,42 @@ h1,h2,h3,p{margin:0}
       </section>
 
       <!-- WALLET -->
+      <!-- [ホンヤク] EXPOホンヤクをモデルにした翻訳画面（デモ） -->
+      <section class="screen" id="s-trans" aria-label="ホンヤク">
+        <div class="pad gut tr">
+          <div class="tr-head">
+            <div><b>EXPOホンヤク</b><small>デモ版：翻訳は擬似データです</small></div>
+            <button class="btn sm" id="trShow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/></svg>相手に見せる</button>
+          </div>
+          <div class="tr-lang">
+            <span class="tr-from" id="trFrom">日本語 (JA)</span>
+            <button class="tr-swap" id="trSwap" aria-label="翻訳の向きを入れ替える"><svg viewBox="0 0 24 24"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg></button>
+            <label class="tr-to"><span class="sr" id="trToLbl">翻訳先</span><select id="trLang" aria-label="相手の言語（30言語）"></select></label>
+          </div>
+          <div class="seg" id="trSeg" role="group" aria-label="翻訳モード">
+            <button data-tm="talk" aria-pressed="true">対話</button>
+            <button data-tm="cam" aria-pressed="false">カメラ翻訳</button>
+            <button data-tm="dict" aria-pressed="false">万博用語集</button>
+          </div>
+          <div id="trTalk" class="tr-talk">
+            <div class="tr-tl" id="trTl" aria-live="polite"></div>
+            <div class="chips" id="trPhr" aria-label="よく使うフレーズ"></div>
+            <div class="tr-input"><input id="trIn" type="text" enterkeyhint="send" aria-label="翻訳する文"><button class="btn pri" id="trSendBtn">翻訳</button></div>
+            <button class="tr-mic" id="trMic"></button>
+          </div>
+          <div id="trCam" hidden>
+            <div class="trcam" id="trCamBox"></div>
+            <div class="btnrow" style="margin-top:10px"><button class="btn" data-cam="sign" aria-pressed="false">デモ：パビリオン案内板を撮影</button><button class="btn" data-cam="menu" aria-pressed="false">デモ：フードコートメニューを撮影</button></div>
+            <button class="btn full" id="trCamToggle" style="margin-top:8px;width:100%" hidden>原文だけ表示</button>
+          </div>
+          <div id="trDict" hidden>
+            <p class="small muted" style="margin:0 0 10px">万博固有の言葉は専用辞書で訳すので、誤訳されません。タップで発音を再生（デモ）。</p>
+            <div class="gl-list" id="trDictList"></div>
+          </div>
+        </div>
+        <div class="trov" id="trOv" hidden role="dialog" aria-label="相手に見せる画面"></div>
+      </section>
+
       <section class="screen" id="s-wallet" aria-label="ウォレット">
         <div class="pad gut" id="walletBody"></div>
       </section>
@@ -467,6 +566,7 @@ h1,h2,h3,p{margin:0}
       <button data-tab="home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>ホーム</button>
       <button data-tab="res"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>予約</button>
       <button data-tab="map"><svg viewBox="0 0 24 24"><path d="M9 4l-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>マップ</button>
+      <button data-tab="trans"><svg viewBox="0 0 24 24"><path d="M3 5h9v7H7l-3 3v-3H3z"/><path d="M12 9h9v7h-1v3l-3-3h-5z"/><path d="M5.5 10l2-4 2 4M6.2 8.6h2.6M14.5 11.5h4M16.5 11v1c0 1.6-1 2.6-2.2 3M15.6 13.2c.7 1 1.6 1.6 2.7 1.8"/></svg>ホンヤク</button>
       <button data-tab="wallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2.5"/><path d="M3 10h18M16 15h2"/></svg>ウォレット</button>
       <button data-tab="staff" class="t-staff"><svg viewBox="0 0 24 24"><path d="M4 14v-3a8 8 0 0 1 16 0v3"/><rect x="2.5" y="13" width="4" height="6" rx="1.5"/><rect x="17.5" y="13" width="4" height="6" rx="1.5"/><path d="M19.5 19c0 1.7-2 2.5-5 2.5"/></svg>現場</button>
     </nav>
@@ -955,6 +1055,7 @@ function go(tab,opt){
   if(tab==='res')renderRes();
   if(tab==='wallet'){if(opt&&opt.wtab)state.wtab=opt.wtab;renderWallet()}
   if(tab==='home')renderHome();
+  if(tab==='trans')renderTrans(opt); // [ホンヤク]
   var sc=$('#s-'+tab);if(sc&&tab!=='map')sc.scrollTop=0;
 }
 $('#tabs').addEventListener('click',function(e){var b=e.target.closest('button[data-tab]');if(b)go(b.dataset.tab)});
@@ -1928,12 +2029,14 @@ function facSheet(id){
     }
   }
   var canRoute=f.kind!=='wc'||true;
-  html+='<div class="btnrow"><button class="btn pri" data-x="route">ここへ向かう</button>'+(f.kind==='pav'&&f.sameType?'<button class="btn" data-x="res">予約・整理券</button>':'<button class="btn" data-x="close">閉じる</button>')+(stamp?'<button class="btn full" data-x="check">スタンプをもらう（チェックイン）</button>':'')+'</div>';
+  html+='<div class="btnrow"><button class="btn pri" data-x="route">ここへ向かう</button>'+(f.kind==='pav'&&f.sameType?'<button class="btn" data-x="res">予約・整理券</button>':'<button class="btn" data-x="close">閉じる</button>')+(stamp?'<button class="btn full" data-x="check">スタンプをもらう（チェックイン）</button>':'')+'</div>'+
+    '<button class="tr-link" data-x="trans"><svg viewBox="0 0 24 24"><path d="M3 5h9v7H7l-3 3v-3H3z"/><path d="M12 9h9v7h-1v3l-3-3h-5z"/></svg>この施設について質問を翻訳する</button>'; /* [ホンヤク] ワンアプリ導線 */
   openSheet(html,function(root){root.onclick=function(ev){
     var x=ev.target.closest('[data-x]');if(!x)return;
     if(x.dataset.x==='route'){state.route=id;closeSheet();buildPins();showMsg(f.name+'まで 約'+m+'m・徒歩'+w+'分',true);var c=$('#msgClr');if(c)c.onclick=function(){state.route=null;$('#mapmsg').hidden=true;buildPins()}}
     else if(x.dataset.x==='res'){closeSheet();state.rs='same';go('res')}
     else if(x.dataset.x==='check'){closeSheet();checkIn(id)}
+    else if(x.dataset.x==='trans'){closeSheet();go('trans',{fac:f})}
     else closeSheet();
   }});
 }
@@ -2057,6 +2160,151 @@ setInterval(function(){
   var keys=['free','ticket','closed','wait'].filter(function(k){return k!==state.fac[f.id].st});var k=keys[Math.floor(Math.random()*keys.length)];
   publish({type:'status',id:f.id,st:k,wait:DEFAULT_WAIT[k]==null?null:Math.max(0,DEFAULT_WAIT[k]+Math.round((Math.random()-.5)*4)*5),by:'GSA-0715'});
 },26000);
+
+/* =====================================================================
+   [ホンヤク] EXPOホンヤクをモデルにした翻訳画面（UIデモ。外部APIとは通信しない）
+   ・30言語の選択、対話（定型フレーズ・擬似音声・テキスト）、相手に見せる（上下反転）、カメラ翻訳（AR風）、万博用語集
+   ・訳例データは 英語／中国語（簡体字）／韓国語／フランス語。それ以外の言語は英語訳に [言語コード] を付けて表示
+   ===================================================================== */
+var TR_LANGS=[['ja','日本語','JA'],['en','英語','EN'],['zh','中国語（簡体字）','ZH-CN'],['zh-TW','中国語（繁体字）','ZH-TW'],['ko','韓国語','KO'],['fr','フランス語','FR'],['es','スペイン語','ES'],['de','ドイツ語','DE'],['it','イタリア語','IT'],['pt','ポルトガル語','PT'],['ar','アラビア語','AR'],['th','タイ語','TH'],['vi','ベトナム語','VI'],['id','インドネシア語','ID'],['ms','マレー語','MS'],['tl','タガログ語','TL'],['hi','ヒンディー語','HI'],['tr','トルコ語','TR'],['nl','オランダ語','NL'],['pl','ポーランド語','PL'],['uk','ウクライナ語','UK'],['sv','スウェーデン語','SV'],['no','ノルウェー語','NO'],['da','デンマーク語','DA'],['fi','フィンランド語','FI'],['cs','チェコ語','CS'],['hu','ハンガリー語','HU'],['ro','ルーマニア語','RO'],['el','ギリシャ語','EL'],['he','ヘブライ語','HE']];
+/* デモ用の訳例（日本語 → 英・中・韓・仏） */
+var TR_DICT={
+  '大屋根リングの45番の柱はどこですか？':{en:'Where is pillar No. 45 of the Grand Ring?',zh:'大屋顶环的45号柱子在哪里？',ko:'그랜드 링 45번 기둥은 어디에 있나요?',fr:'Où se trouve le pilier n° 45 du Grand Ring ?'},
+  '東ゲートから北へ徒歩3分ほどです。':{en:"It's about a 3-minute walk north from the East Gate.",zh:'从东门向北步行约3分钟。',ko:'동쪽 게이트에서 북쪽으로 걸어서 약 3분 거리입니다.',fr:"C'est à environ 3 minutes à pied au nord de la porte Est."},
+  'このパビリオンは予約が必要ですか？':{en:'Does this pavilion require a reservation?',zh:'这个展馆需要预约吗？',ko:'이 파빌리온은 예약이 필요한가요?',fr:'Faut-il réserver pour ce pavillon ?'},
+  '給水機とトイレはどこにありますか？':{en:'Where are the water stations and restrooms?',zh:'饮水机和洗手间在哪里？',ko:'급수기와 화장실은 어디에 있나요?',fr:'Où se trouvent les fontaines à eau et les toilettes ?'},
+  'ミャクペ！で支払えますか？':{en:'Can I pay with Myaku-Pay!?',zh:'可以用Myaku-Pay!支付吗？',ko:'Myaku-Pay!로 결제할 수 있나요?',fr:'Puis-je payer avec Myaku-Pay! ?'},
+  'ベビーカーで入れますか？':{en:'Can I enter with a stroller?',zh:'可以推婴儿车进入吗？',ko:'유모차를 가지고 들어갈 수 있나요?',fr:'Puis-je entrer avec une poussette ?'},
+  'アレルギー表示はありますか？':{en:'Is there allergen information?',zh:'有过敏原标识吗？',ko:'알레르기 표시가 있나요?',fr:'Y a-t-il des informations sur les allergènes ?'},
+  'コモンズ館Aでルワンダのコーヒーは飲めますか？':{en:'Can I get Rwandan coffee at Commons Pavilion A?',zh:'在Commons馆A可以喝到卢旺达咖啡吗？',ko:'커먼즈관 A에서 르완다 커피를 마실 수 있나요?',fr:'Peut-on boire du café rwandais au pavillon Commons A ?'},
+  '整理券は何時から配布されますか？':{en:'What time do they start handing out numbered tickets?',zh:'号码牌几点开始发放？',ko:'번호표는 몇 시부터 배부하나요?',fr:'À partir de quelle heure les tickets numérotés sont-ils distribués ?'},
+  '静けさの森へはどう行けばいいですか？':{en:'How do I get to the Forest of Tranquility?',zh:'怎么去静谧之森？',ko:'고요함의 숲에는 어떻게 가나요?',fr:'Comment aller à la Forêt de la tranquillité ?'}
+};
+/* 施設名入りの質問テンプレート（マップの詳細シートから） */
+var TR_TPL=[
+  {re:/^「(.+)」はどこですか？$/,ja:'「$1」はどこですか？',en:'Where is "$1"?',zh:'「$1」在哪里？',ko:'「$1」은(는) 어디에 있나요?',fr:'Où se trouve « $1 » ?'},
+  {re:/^「(.+)」は予約が必要ですか？$/,ja:'「$1」は予約が必要ですか？',en:'Does "$1" require a reservation?',zh:'「$1」需要预约吗？',ko:'「$1」은(는) 예약이 필요한가요?',fr:'Faut-il réserver pour « $1 » ?'},
+  {re:/^「(.+)」の待ち時間はどれくらいですか？$/,ja:'「$1」の待ち時間はどれくらいですか？',en:'How long is the wait for "$1"?',zh:'「$1」需要等多久？',ko:'「$1」 대기 시간은 얼마나 되나요?',fr:'Quel est le temps d\'attente pour « $1 » ?'}
+];
+/* 万博用語集（固有名詞の誤訳防止） */
+var TR_GLOSS=[
+  ['大屋根リング','おおやねリング',{en:'Grand Ring',zh:'大屋顶环',ko:'그랜드 링',fr:'Grand Ring'},'会場を囲む世界最大級の木造建築'],
+  ['ミャクミャク','',{en:'MYAKU-MYAKU',zh:'MYAKU-MYAKU（吉祥物）',ko:'먀쿠먀쿠',fr:'Myaku-Myaku'},'公式キャラクター'],
+  ['ミャクペ！','',{en:'Myaku-Pay!',zh:'Myaku-Pay!',ko:'Myaku-Pay!',fr:'Myaku-Pay!'},'会場の電子決済サービス'],
+  ['コモンズ館','コモンズかん',{en:'Commons Pavilion',zh:'Commons馆',ko:'커먼즈관',fr:'Pavillon Commons'},'複数の国が共同で出展する館'],
+  ['シグネチャーパビリオン','',{en:'Signature Pavilion',zh:'主题馆（Signature Pavilion）',ko:'시그니처 파빌리온',fr:'Pavillon Signature'},'8人のプロデューサーによるテーマ館'],
+  ['静けさの森','しずけさのもり',{en:'Forest of Tranquility',zh:'静谧之森',ko:'고요함의 숲',fr:'Forêt de la tranquillité'},'会場中央の森'],
+  ['ウォータープラザ','',{en:'Water Plaza',zh:'水上广场',ko:'워터 플라자',fr:'Water Plaza'},'水上ショーの会場'],
+  ['東ゲート','ひがしゲート',{en:'East Gate',zh:'东门',ko:'동쪽 게이트',fr:'Porte Est'},'夢洲駅側の入場ゲート'],
+  ['西ゲート','にしゲート',{en:'West Gate',zh:'西门',ko:'서쪽 게이트',fr:'Porte Ouest'},'シャトルバス側の入場ゲート'],
+  ['夢洲','ゆめしま',{en:'Yumeshima',zh:'梦洲',ko:'유메시마',fr:'Yumeshima'},'会場のある人工島'],
+  ['整理券','せいりけん',{en:'Numbered ticket',zh:'号码牌',ko:'번호표',fr:'Ticket numéroté'},'先着順の入場券'],
+  ['当日登録','とうじつとうろく',{en:'Same-day reservation',zh:'当日登记',ko:'당일 등록',fr:'Réservation le jour même'},'会場内での当日予約']
+];
+var TR_MIC=['コモンズ館Aでルワンダのコーヒーは飲めますか？','整理券は何時から配布されますか？','静けさの森へはどう行けばいいですか？'];
+var TR_PHRASES=['このパビリオンは予約が必要ですか？','給水機とトイレはどこにありますか？','ミャクペ！で支払えますか？','ベビーカーで入れますか？','アレルギー表示はありますか？'];
+var tr={lang:'en',dir:'ja2x',mode:'talk',items:[],mic:0,facPhr:null,camDemo:null,camShowOrig:false,listening:false};
+tr.items=[{ja:'大屋根リングの45番の柱はどこですか？',side:'me'},{ja:'東ゲートから北へ徒歩3分ほどです。',side:'them'}];
+function trL(code){return TR_LANGS.find(function(l){return l[0]===code})}
+/* 日本語 → 選択言語（辞書・テンプレート一致なら訳例、なければ英語相当＋言語コード） */
+function trTo(ja,code){
+  var d=TR_DICT[ja],l=trL(code),has=['en','zh','ko','fr'].indexOf(code)>=0;
+  if(!d){for(var i=0;i<TR_TPL.length;i++){var m=ja.match(TR_TPL[i].re);if(m){d={};['en','zh','ko','fr'].forEach(function(k){d[k]=TR_TPL[i][k].replace('$1',trGlossName(m[1],k))});break}}}
+  if(d)return {text:has?d[code]:'['+l[2]+'] '+d.en,exact:true};
+  return {text:'['+l[2]+' Translation] '+ja,exact:false};
+}
+/* 主な施設名の対訳（中・韓・仏は固有名詞として英語表記を使う） */
+var TR_NAMES={'日本館':'Japan Pavilion','アメリカ':'USA Pavilion','フランス館':'France Pavilion','イタリア館':'Italy Pavilion','ドイツ館':'Germany Pavilion','英国館':'UK Pavilion','中国':'China Pavilion','韓国':'Korea Pavilion','大阪ヘルスケア':'Osaka Healthcare Pavilion','関西パビリオン':'Kansai Pavilion','GUNDAM NEXT FUTURE':'GUNDAM NEXT FUTURE PAVILION','EXPOホール':'EXPO Hall','null²':'null²','ガスパビリオン':'Gas Pavilion','住友館':'Sumitomo Pavilion','電力館':'Electric Power Pavilion','空飛ぶクルマST':'Advanced Air Mobility Station','オランダ館':'Netherlands Pavilion','スペイン館':'Spain Pavilion','サウジアラビア館':'Saudi Arabia Pavilion'};
+function trGlossName(name,k){var g=TR_GLOSS.find(function(x){return x[0]===name});if(g)return g[2][k];var cm=name.match(/^コモンズ([A-F])$/);if(cm)return (k==='zh'?'Commons馆':k==='ko'?'커먼즈관 ':'Commons Pavilion ')+cm[1];return TR_NAMES[name]||name}
+function trGlossHits(ja){return TR_GLOSS.filter(function(g){return ja.indexOf(g[0])>=0})}
+function trTerm(g,code){return g[2][code]||(g[2].en+(code==='ja'?'':' ['+trL(code)[2]+']'))}
+/* 1件の発話を、いまの方向（日本語→相手／相手→日本語）で表示用に展開 */
+function trView(it){
+  var x=trTo(it.ja,tr.lang),l=trL(tr.lang);
+  if(tr.dir==='ja2x')return {src:it.ja,srcL:'JA',out:x.text,outL:l[2],exact:x.exact};
+  return {src:x.text,srcL:l[2],out:it.ja,outL:'JA',exact:x.exact};
+}
+function renderTrans(opt){
+  opt=opt||{};
+  if(opt.fac){var f=opt.fac;tr.mode='talk';tr.facPhr=['「'+(f.short||f.name)+'」はどこですか？','「'+(f.short||f.name)+'」は予約が必要ですか？','「'+(f.short||f.name)+'」の待ち時間はどれくらいですか？'];setTimeout(function(){var i=$('#trIn');if(i){i.value=tr.facPhr[0];i.focus()}},50)}
+  var l=trL(tr.lang);
+  $('#trLang').value=tr.lang;
+  $('#trFrom').textContent=tr.dir==='ja2x'?'日本語 (JA)':l[1]+' ('+l[2]+')';
+  $('#trToLbl').textContent=tr.dir==='ja2x'?'翻訳先':'翻訳元';
+  $$('#trSeg button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.tm===tr.mode)});
+  $('#trTalk').hidden=tr.mode!=='talk';$('#trCam').hidden=tr.mode!=='cam';$('#trDict').hidden=tr.mode!=='dict';
+  $('#trShow').hidden=tr.mode!=='talk';
+  if(tr.mode==='talk'){
+    $('#trTl').innerHTML=tr.items.map(function(it,i){var v=trView(it),hits=trGlossHits(it.ja);
+      return '<div class="tb '+it.side+(it.fresh?' fresh':'')+'"><div class="tb-who">'+(it.side==='me'?'あなた':'スタッフ')+'</div><div class="tb-src"><span class="lc">'+v.srcL+'</span>'+esc(v.src)+'</div><div class="tb-out"><span class="lc">'+v.outL+'</span><span>'+esc(v.out)+'</span><button class="tb-sp" data-sp="'+i+'" aria-label="読み上げ"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg></button></div>'+
+        (hits.length&&tr.dir==='ja2x'?'<div class="tb-gl">用語辞書：'+hits.map(function(g){return esc(g[0])+' → '+esc(trTerm(g,tr.lang))}).join('、')+'</div>':'')+(!v.exact?'<div class="tb-gl">デモのため定型文以外は擬似訳を表示</div>':'')+'</div>'}).join('');
+    tr.items.forEach(function(it){it.fresh=false});
+    var tl=$('#trTl');tl.scrollTop=tl.scrollHeight;
+    var ph=(tr.facPhr||[]).concat(TR_PHRASES);
+    $('#trPhr').innerHTML=ph.map(function(p,i){return '<button class="chip'+(tr.facPhr&&i<tr.facPhr.length?' fac':'')+'" data-ph="'+esc(p)+'">'+esc(tr.dir==='ja2x'?p:trTo(p,tr.lang).text)+'</button>'}).join('');
+    $('#trIn').placeholder=tr.dir==='ja2x'?'日本語で入力（例：トイレはどこですか？）':l[1]+'で入力';
+  }
+  if(tr.mode==='dict'){
+    $('#trDictList').innerHTML=TR_GLOSS.map(function(g,i){return '<button class="gl" data-gl="'+i+'"><span class="gl-ja"><b>'+esc(g[0])+'</b>'+(g[1]?'<small>'+esc(g[1])+'</small>':'')+'</span><span class="gl-x">'+esc(trTerm(g,tr.lang))+'</span><span class="gl-note">'+esc(g[3])+'</span><svg viewBox="0 0 24 24" class="gl-sp"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg></button>'}).join('');
+  }
+  if(tr.mode==='cam')renderTrCam();
+}
+function trAdd(ja,side){tr.items.push({ja:ja,side:side||'me',fresh:true});renderTrans()}
+/* 相手側の言語で入力されたテキスト → 訳例と一致すれば日本語、なければ擬似訳 */
+function trFromX(text){
+  var hit=Object.keys(TR_DICT).find(function(ja){return trTo(ja,tr.lang).text===text});
+  return hit||null;
+}
+function trSend(){
+  var i=$('#trIn'),t=(i.value||'').trim();if(!t)return;i.value='';
+  if(tr.dir==='ja2x'){trAdd(t,'me');return}
+  var ja=trFromX(t);if(ja){trAdd(ja,'them');return}
+  tr.items.push({ja:'[JA訳] '+t,side:'them',fresh:true});renderTrans();
+}
+function trMic(){
+  if(tr.listening)return;tr.listening=true;var b=$('#trMic');b.classList.add('on');b.innerHTML='<span class="wave"><i></i><i></i><i></i><i></i><i></i></span>聞き取り中…';
+  setTimeout(function(){tr.listening=false;b.classList.remove('on');b.innerHTML=micLabel();var ja=TR_MIC[tr.mic++%TR_MIC.length];trAdd(ja,tr.dir==='ja2x'?'me':'them')},1500);
+}
+function micLabel(){return '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>話して翻訳'}
+/* 相手に見せる：直近の訳を画面いっぱい＆上下反転 */
+function trShow(){
+  var it=tr.items[tr.items.length-1];if(!it)return;var v=trView(it);
+  var ov=$('#trOv');ov.innerHTML='<div class="trov-card"><div class="lc">'+v.outL+'</div><div class="trov-t">'+esc(v.out)+'</div><div class="trov-s">'+esc(v.src)+'</div><div class="small" style="opacity:.7;margin-top:10px">タップで戻る</div></div>';
+  ov.hidden=false;
+}
+/* カメラ翻訳（AR風）：SVGで描いた案内板／メニューに日本語訳ラベルを重ねる */
+var TR_CAM={
+  sign:{title:'パビリオン案内板',svg:'<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><rect width="400" height="300" fill="#2a3346"/><rect x="40" y="34" width="320" height="232" rx="10" fill="#f4f1e8"/><rect x="40" y="34" width="320" height="46" rx="10" fill="#1f4fb8"/><rect x="40" y="64" width="320" height="16" fill="#1f4fb8"/><text x="200" y="64" font-size="20" font-weight="800" fill="#fff" text-anchor="middle" font-family="Arial">PAVILION INFORMATION</text><text x="62" y="118" font-size="17" font-weight="700" fill="#1c2433" font-family="Arial">Reservation required</text><text x="62" y="152" font-size="17" fill="#1c2433" font-family="Arial">Next show: 14:30</text><text x="62" y="186" font-size="17" fill="#1c2433" font-family="Arial">Please line up here  →</text><text x="62" y="220" font-size="17" fill="#c0392b" font-family="Arial">No food or drink inside</text><text x="62" y="250" font-size="13" fill="#6b7280" font-family="Arial">Strollers welcome / Wheelchair access</text></svg>',
+    labels:[[50,13,'パビリオン案内'],[33,38,'予約が必要です'],[30,49,'次回の上映：14:30'],[36,61,'こちらにお並びください →'],[33,72,'館内での飲食はできません'],[40,82,'ベビーカー可・車いすで入場可']]},
+  menu:{title:'フードコートのメニュー',svg:'<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><rect width="400" height="300" fill="#3a2a22"/><rect x="40" y="30" width="320" height="240" rx="12" fill="#1d1d1f"/><text x="200" y="68" font-size="21" font-weight="800" fill="#f5c451" text-anchor="middle" font-family="Arial">FOOD COURT MENU</text><line x1="62" y1="82" x2="338" y2="82" stroke="#f5c451" stroke-width="1.5"/><g font-family="Arial" font-size="16" fill="#fff"><text x="62" y="116">Takoyaki (6 pcs)</text><text x="338" y="116" text-anchor="end">¥800</text><text x="62" y="148">Halal Chicken Curry</text><text x="338" y="148" text-anchor="end">¥1,200</text><text x="62" y="180">Vegan Rice Bowl</text><text x="338" y="180" text-anchor="end">¥1,100</text><text x="62" y="212">Matcha Soft Serve</text><text x="338" y="212" text-anchor="end">¥600</text></g><text x="62" y="248" font-size="13" fill="#f59e0b" font-family="Arial">Allergens: wheat / egg / milk</text></svg>',
+    labels:[[50,21,'フードコート メニュー'],[30,38,'たこ焼き（6個）'],[33,49,'ハラール チキンカレー'],[31,59,'ヴィーガン ライスボウル'],[30,70,'抹茶ソフトクリーム'],[38,82,'アレルゲン：小麦・卵・乳']]}
+};
+function renderTrCam(){
+  var box=$('#trCamBox'),d=tr.camDemo&&TR_CAM[tr.camDemo];
+  $$('#trCam [data-cam]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.cam===tr.camDemo)});
+  $('#trCamToggle').hidden=!d;$('#trCamToggle').textContent=tr.camShowOrig?'翻訳を表示':'原文だけ表示';
+  if(!d){box.innerHTML='<div class="trcam-idle"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>看板・メニュー・案内板にカメラを向けると<br>日本語訳が重なって表示されます<br><small>下のデモボタンで体験できます</small></div>';return}
+  box.innerHTML=d.svg+'<div class="trcam-scan"></div><div class="trcam-ar'+(tr.camShowOrig?' off':'')+'">'+d.labels.map(function(l,i){return '<span style="left:'+l[0]+'%;top:'+l[1]+'%;animation-delay:'+(0.55+i*0.08)+'s">'+esc(l[2])+'</span>'}).join('')+'</div><div class="trcam-cap">AR翻訳：'+d.title+'（EN → JA）</div>';
+}
+(function(){
+  $('#trLang').innerHTML=TR_LANGS.filter(function(l){return l[0]!=='ja'}).map(function(l){return '<option value="'+l[0]+'">'+l[1]+' ('+l[2]+')</option>'}).join('');
+  $('#trLang').onchange=function(){tr.lang=this.value;renderTrans()};
+  $('#trSwap').onclick=function(){tr.dir=tr.dir==='ja2x'?'x2ja':'ja2x';renderTrans()};
+  $('#trSeg').onclick=function(e){var b=e.target.closest('[data-tm]');if(!b)return;tr.mode=b.dataset.tm;renderTrans()};
+  $('#trPhr').onclick=function(e){var b=e.target.closest('[data-ph]');if(!b)return;trAdd(b.dataset.ph,tr.dir==='ja2x'?'me':'them')};
+  $('#trSendBtn').onclick=trSend;
+  $('#trIn').onkeydown=function(e){if(e.key==='Enter'&&!e.isComposing){e.preventDefault();trSend()}};
+  $('#trMic').onclick=trMic;$('#trMic').innerHTML=micLabel();
+  $('#trShow').onclick=trShow;
+  $('#trOv').onclick=function(){this.hidden=true};
+  $('#trTl').onclick=function(e){var b=e.target.closest('[data-sp]');if(!b)return;var v=trView(tr.items[+b.dataset.sp]);toast('🔊 「'+v.out+'」を再生しました（デモ）')};
+  $('#trDictList').onclick=function(e){var b=e.target.closest('[data-gl]');if(!b)return;var g=TR_GLOSS[+b.dataset.gl];toast('🔊 '+trTerm(g,tr.lang)+'（'+g[0]+'）を再生しました')};
+  $('#trCam').onclick=function(e){
+    var b=e.target.closest('[data-cam]');if(b){tr.camDemo=b.dataset.cam;tr.camShowOrig=false;renderTrCam();return}
+    if(e.target.id==='trCamToggle'){tr.camShowOrig=!tr.camShowOrig;renderTrCam()}
+  };
+  renderTrans();
+})();
 
 /* ---------- boot ---------- */
 /* [ベースマップ画像] OSM の実測データ取得は使わない（公式マップ画像をベースマップにしたため） */
